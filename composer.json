@@ -1,0 +1,23 @@
+{
+	"name": "slendium/ocd",
+	"description": "Database-agnostic ORM for PHP.",
+	"type": "library",
+	"require-dev": {
+		"phpstan/phpstan": "^2.1"
+	},
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"Slendium\\Ocd\\": "src/"
+		}
+	},
+	"authors": [
+		{
+			"name": "C. Fahner",
+			"email": "cfahner.git.ixuk9phi@slendium.org"
+		}
+	],
+	"require": {
+		"php": "^8.4"
+	}
+}

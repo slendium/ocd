@@ -1,23 +1,25 @@
 {
 	"name": "slendium/ocd",
-	"description": "Database-agnostic ORM for PHP.",
+	"description": "Database- and framework agnostic ORM.",
 	"type": "library",
+	"require": {
+		"php": "^8.5"
+	},
 	"require-dev": {
-		"phpstan/phpstan": "^2.1"
+		"phpstan/phpstan": "^2.2",
+		"phpunit/phpunit": "^13.2"
 	},
 	"license": "MIT",
-	"autoload": {
-		"psr-4": {
-			"Slendium\\Ocd\\": "src/"
-		}
-	},
+	"autoload": { "psr-4": {
+		"Slendium\\Ocd\\": "src/"
+	} },
+	"autoload-dev": { "psr-4": {
+		"Slendium\\OcdTests\\": "tests/"
+	} },
 	"authors": [
 		{
 			"name": "C. Fahner",
 			"email": "cfahner.git.ixuk9phi@slendium.org"
 		}
-	],
-	"require": {
-		"php": "^8.4"
-	}
+	]
 }

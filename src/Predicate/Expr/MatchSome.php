@@ -2,8 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
-use Slendium\Ocd\Predicate\FieldPath;
 
 /**
  * Evaluates to `true` if the given field matches at least one of the given values exactly.

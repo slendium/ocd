@@ -4,6 +4,7 @@ namespace Slendium\Ocd\Predicate;
 
 use Closure;
 
+use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
 use Slendium\Ocd\Schema\StorageClass;
 

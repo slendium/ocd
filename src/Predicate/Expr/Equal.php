@@ -2,8 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
-use Slendium\Ocd\Predicate\FieldPath;
 
 /**
  * Evaluates to `true` if both sides are equal to each other, both in type and value.

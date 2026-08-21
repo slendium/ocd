@@ -2,8 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
-use Slendium\Ocd\Predicate\FieldPath;
 
 /**
  * Evaluates to `true` if the left-hand-side is less than or equal to the right-hand-side.

@@ -4,10 +4,10 @@ namespace Slendium\OcdTests\Unit\Predicate;
 
 use PHPUnit\Framework\TestCase;
 
+use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
 use Slendium\Ocd\Predicate\DocumentShape as Q;
 use Slendium\Ocd\Predicate\Expr;
-use Slendium\Ocd\Predicate\FieldPath;
 use Slendium\Ocd\Schema\StorageClass;
 
 /**

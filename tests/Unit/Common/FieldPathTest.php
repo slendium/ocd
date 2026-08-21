@@ -1,10 +1,10 @@
 <?php
 
-namespace Slendium\OcdTests\Unit\Predicate;
+namespace Slendium\OcdTests\Unit\Common;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Predicate\FieldPath;
+use Slendium\Ocd\Common\FieldPath;
 
 /**
  * @internal

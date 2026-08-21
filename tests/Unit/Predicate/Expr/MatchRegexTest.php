@@ -4,8 +4,8 @@ namespace Slendium\OcdTests\Unit\Predicate\Expr;
 
 use PHPUnit\Framework\TestCase;
 
+use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate\Expr;
-use Slendium\Ocd\Predicate\FieldPath;
 
 /**
  * BC tests. Properties, labeled parameters and constructor defaults should not change.

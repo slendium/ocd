@@ -1,6 +1,6 @@
 <?php
 
-namespace Slendium\Ocd\Predicate;
+namespace Slendium\Ocd\Common;
 
 /**
  * A path to a field.

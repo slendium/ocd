@@ -291,23 +291,6 @@ final class DocumentShapeTest extends TestCase {
 		$this->assertSame($expectedPath, $result->field->path);
 	}
 
-	public function test_field_shouldReturnSameInstance_whenInvokedWithInstance(): void {
-		$expectedResult = new FieldPath([ 'test' ]);
-
-		$result = Q::field($expectedResult);
-
-		$this->assertSame($expectedResult, $result);
-	}
-
-	public function test_field_shouldReturnExpectedResult_whenInvokedWithString(): void {
-		$field = 'test';
-
-		$result = Q::field($field);
-
-		$this->assertSame(1, \count($result->path));
-		$this->assertSame($field, $result->path[0]);
-	}
-
 	public function test_field_shouldReturnExpectedResult_whenInvokedWithArray(): void {
 		$field = [ 'test', 'inner' ];
 

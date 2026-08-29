@@ -56,8 +56,8 @@ final class DocumentShape {
 		$inputs = [ ];
 		foreach ($shape as $field => $spec) {
 			$inputs[] = $spec instanceof Closure
-				? $spec(self::field((string)$field))
-				: new Expr\Equal(self::field((string)$field), $spec);
+				? $spec(new FieldPath([ (string)$field ]))
+				: new Expr\Equal(new FieldPath([ (string)$field ]), $spec);
 		}
 		return new Expr\And_($inputs);
 	}
@@ -221,18 +221,16 @@ final class DocumentShape {
 	}
 
 	/**
-	 * Shorthand for normalizing fields to a {@see FieldPath} instance.
+	 * Shorthand for `new FieldPath`.
+	 *
+	 * This saves an import and looks more consistent when working with document shape queries.
+	 *
 	 * @since 1.0
-	 * @param FieldPath|non-empty-list<non-empty-string>|non-empty-string $field
+	 * @see FieldPath
+	 * @param non-empty-list<non-empty-string> $path
 	 */
-	public static function field(FieldPath|array|string $field): FieldPath {
-		if (\is_string($field)) {
-			$field = [ $field ];
-		}
-
-		return \is_array($field)
-			? new FieldPath($field)
-			: $field;
+	public static function field(array $path): FieldPath {
+		return new FieldPath($path);
 	}
 
 	/**

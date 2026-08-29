@@ -24,6 +24,7 @@ final readonly class Field {
 			defaultValue: $parameter->isOptional()
 				? $parameter->getDefaultValue()
 				: null,
+			originalName: $parameter->name, // @phpstan-ignore argument.type (never non-empty)
 		);
 	}
 
@@ -43,6 +44,16 @@ final readonly class Field {
 
 		/** @since 1.0 */
 		public mixed $defaultValue,
+
+		/**
+		 * Contains the name of the field before being renamed by the {@see FieldName} attribute.
+		 *
+		 * Ie. it contains the name of the function parameter which the field definition is based on.
+		 *
+		 * @since 1.0
+		 * @var non-empty-string
+		 */
+		public string $originalName,
 
 	) { }
 

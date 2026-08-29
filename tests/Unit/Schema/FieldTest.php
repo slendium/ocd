@@ -69,4 +69,25 @@ final class FieldTest extends TestCase {
 		$this->assertSame(FieldTest\NullableFieldWithDefaultEntity::DEFAULT_VALUE, $resultDefaultValue);
 	}
 
+	public function test_originalName_shouldContainExpectedValue_whenFieldIsRenamed(): void {
+		$name = FieldTest\RenamedFieldEntity::RENAMED_NAME;
+		$expectedResult = FieldTest\RenamedFieldEntity::ORIGINAL_NAME;
+		$sut = Schema::fromConstructorParameters(FieldTest\RenamedFieldEntity::class)->fields[$name];
+
+		$result = $sut->originalName; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
+
+		$this->assertSame($expectedResult, $result);
+	}
+
+	public function test_originalName_shouldMatchCurrentName_whenFieldIsNotRenamed(): void {
+		$name = FieldTest\NonRenamedFieldEntity::FIELD_NAME;
+		$sut = Schema::fromConstructorParameters(FieldTest\NonRenamedFieldEntity::class)->fields[$name];
+
+		$resultName = $sut->name; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
+		$resultOriginalName = $sut->originalName; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
+
+		$this->assertSame($name, $resultName);
+		$this->assertSame($name, $resultOriginalName);
+	}
+
 }

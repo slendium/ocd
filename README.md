@@ -57,25 +57,97 @@ TODO
 
 ### Querying
 
-TODO
+Data can be queried using a set of generalized expressions.
+You can manually construct them, use a predefined builder utility or create your own builder.
+An example using the built in "document shape" query builder:
+
+```php
+use Slendium\Ocd\Predicate\DocumentShape as Q;
+
+$filter = Q::shape([
+	'year' => 2026, // match a literal int
+	'views' => Q::gte(1000),
+	'title' => Q::regex('^'),
+	'tags' => Q::containsSome([ 'news', 'updates' ])
+]);
+
+$cursor = $collection->openCursor()
+	|> Cursor::filter(?, $filter)
+	|> Cursor::skip(?, $page * PAGE_SIZE)
+	|> Cursor::limit(?, PAGE_SIZE);
+
+foreach ($cursor as $doc) { } // do something with each document
+```
 
 ### Manipulating data
 
-TODO
+#### Inserting data
+
+Data can be inserted by passing "documents" to an insert command.
+A document is any object that is `ArrayAccess&Countable&Traversable` with non-empty strings for keys.
+See the documentation of the `Collection::startInsert()` function to learn more about what types of
+values can be contained in inserted documents.
+An example:
+
+```php
+$document = new MutableDocument([
+	'name' => 'foo',
+	'createdAt' => new DateTime,
+	'location' => [ $latitude, $longitude ],
+	'owner' => $userEntity,
+]);
+
+$collection->startInsert([ $document ])
+	|> InsertCommand::fireAndForget(?);
+```
+
+#### Updating data
+
+Data can be updated by providing a query and a list of update statements.
+Analogous to the data querying example, update statement lists can be constructed manually or through
+builder utilities.
+An example:
+
+```php
+use Slendium\Ocd\Predicate\DocumentShape as Q;
+use Slendium\Ocd\Update\DocumentUpdate as U;
+
+$filter = Q::shape([ 'id' => $updateId ]);
+
+$updates = U::create([
+	'name' => $newName,
+	'modificationCount' => U::add(1),
+	'auditLog' => U::append("At $modifiedAt, user {$user->name} changed name to `$newName`"),
+	'details' => U::path([ 'neverModifiedFlag', U::unset() ])
+]);
+
+$collection->startUpdate($filter, $updates)
+	->execute();
+```
+
+#### Deleting data
+
+Data can be deleted by creating a delete command and executing it.
+An example:
+
+```php
+$filter = Q::shape([ 'id' => $id ]);
+
+$collection->startDelete($filter)
+	|> DeleteCommand::enforceLimit(?, 1)
+	|> DeleteCommand::execute(?);
+```
 
 ## Roadmap
 
 1. **[Done]** Describing the schema
-1. Relationships and indices
-1. Data manipulation
-	1. Create commands
-	1. Update commands
-	1. Delete commands
+1. **[Done]** Data manipulation (create, update, delete)
 1. Data querying
-	1. Reading from a cursor
+	1. **[Done]** Reading from a cursor
 	1. Entity reassembly
-1. Migrating/upgrading data
-1. Data aggregation (GROUP BY and friends)
+1. Relationships and indices
+1. Geospatial data
+1. Data aggregation
 1. Transactions
 
 ### Out of scope

@@ -19,8 +19,8 @@ However, most likely you are looking for a database-specific implementation of t
 * [MongoDB](https://git.frisiapp.com/slendium/ocd-mongodb)
 * [In-memory](https://git.frisiapp.com/slendium/ocd-memory) (for testing)
 
-For implementors there is also the [OCD conformance](https://git.frisiapp.com/slendium/ocd-conformance) package,
-which contains implementation guides and PHPUnit test suites.
+For implementors there is also the [OCD conformance](https://git.frisiapp.com/slendium/ocd-conformance-tests) package,
+which contains implementation guides and PHPUnit tests.
 
 ## Examples
 
@@ -59,7 +59,7 @@ TODO
 
 Data can be queried using a set of generalized expressions.
 You can manually construct them, use a predefined builder utility or create your own builder.
-An example using the built in "document shape" query builder:
+An example using the built-in "document shape" query builder:
 
 ```php
 use Slendium\Ocd\Predicate\DocumentShape as Q;

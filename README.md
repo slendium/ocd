@@ -7,6 +7,7 @@ Database- and framework agnostic database abstraction layer / ORM for PHP.
 * Entities are based on plain PHP classes, adding `#[Attribute]`'s only where more specificity is needed
 * Does not force the active record pattern, inheritance, or a rich domain model (nor exclude them)
 * Developed without LLM's
+* No dependencies
 
 ## Installation
 

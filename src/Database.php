@@ -25,9 +25,9 @@ interface Database {
 	/**
 	 * Returns all existing collections.
 	 * @since 1.0
-	 * @return iterable<non-empty-string,Collection>
+	 * @return list<non-empty-string>
 	 */
-	public function listCollections(): iterable;
+	public function listCollections(): array;
 
 	/**
 	 * Checks if a collection by the given name exists.

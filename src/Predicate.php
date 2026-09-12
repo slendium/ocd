@@ -19,4 +19,14 @@ namespace Slendium\Ocd;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-interface Predicate { }
+interface Predicate {
+
+	/**
+	 * @since 1.0
+	 * @template R
+	 * @param Predicate\Visitor<R> $visitor
+	 * @return R
+	 */
+	public function accept(Predicate\Visitor $visitor): mixed;
+
+}

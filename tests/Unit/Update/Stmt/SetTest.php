@@ -7,6 +7,8 @@ use PHPUnit\Framework\TestCase;
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Update\Stmt;
 
+use Slendium\OcdTests\Unit\Update\MockVisitor;
+
 /**
  * BC tests. Properties, labeled parameters and constructor defaults should not change.
  *
@@ -24,6 +26,16 @@ final class SetTest extends TestCase {
 
 		$this->assertSame($field, $result->field);
 		$this->assertSame($value, $result->value);
+	}
+
+	public function test_accept_shouldCallAppropriateMethod(): void {
+		$sut = new Stmt\Set(new FieldPath([ 'foo' ]), 2);
+		$called = false;
+		$mock = new MockVisitor([ 'visitSet' => function() use (&$called) { $called = true; } ]);
+
+		$sut->accept($mock);
+
+		$this->assertTrue($called);
 	}
 
 }

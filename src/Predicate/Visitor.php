@@ -96,6 +96,12 @@ interface Visitor {
 	 * @since 1.0
 	 * @return R
 	 */
+	public function visitMatchSome(Expr\MatchSome $expr): mixed;
+
+	/**
+	 * @since 1.0
+	 * @return R
+	 */
 	public function visitMatchNone(Expr\MatchNone $expr): mixed;
 
 	/**
@@ -103,11 +109,5 @@ interface Visitor {
 	 * @return R
 	 */
 	public function visitMatchRegex(Expr\MatchRegex $expr): mixed;
-
-	/**
-	 * @since 1.0
-	 * @return R
-	 */
-	public function visitMatchSome(Expr\MatchSome $expr): mixed;
 
 }

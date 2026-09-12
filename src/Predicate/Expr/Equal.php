@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use Override;
+
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
 
@@ -24,5 +26,10 @@ final readonly class Equal implements Predicate {
 		public FieldPath|string|float|int|bool|null $rhs,
 
 	) { }
+
+	#[Override]
+	public function accept(Predicate\Visitor $visitor): mixed {
+		return $visitor->visitEqual($this);
+	}
 
 }

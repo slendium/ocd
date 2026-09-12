@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use Override;
+
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
 use Slendium\Ocd\Schema\StorageClass;
@@ -25,5 +27,10 @@ final readonly class NotOfType implements Predicate {
 		public StorageClass $storageClass,
 
 	) { }
+
+	#[Override]
+	public function accept(Predicate\Visitor $visitor): mixed {
+		return $visitor->visitNotOfType($this);
+	}
 
 }

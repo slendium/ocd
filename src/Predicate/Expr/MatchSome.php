@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use Override;
+
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
 
@@ -29,5 +31,10 @@ final readonly class MatchSome implements Predicate {
 		public array $values,
 
 	) { }
+
+	#[Override]
+	public function accept(Predicate\Visitor $visitor): mixed {
+		return $visitor->visitMatchSome($this);
+	}
 
 }

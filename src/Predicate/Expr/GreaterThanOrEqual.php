@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use Override;
+
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
 
@@ -24,5 +26,10 @@ final readonly class GreaterThanOrEqual implements Predicate {
 		public FieldPath|float|int $rhs,
 
 	) { }
+
+	#[Override]
+	public function accept(Predicate\Visitor $visitor): mixed {
+		return $visitor->visitGreaterThanOrEqual($this);
+	}
 
 }

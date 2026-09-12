@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use Override;
+
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
 
@@ -24,5 +26,10 @@ final readonly class MatchRegex implements Predicate {
 		public string $regex,
 
 	) { }
+
+	#[Override]
+	public function accept(Predicate\Visitor $visitor): mixed {
+		return $visitor->visitMatchRegex($this);
+	}
 
 }

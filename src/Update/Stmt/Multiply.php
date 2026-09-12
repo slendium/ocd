@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Update\Stmt;
 
+use Override;
+
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Update;
 
@@ -24,5 +26,10 @@ final readonly class Multiply implements Update {
 		public float|int $amount,
 
 	) { }
+
+	#[Override]
+	public function accept(Update\Visitor $visitor): mixed {
+		return $visitor->visitMultiply($this);
+	}
 
 }

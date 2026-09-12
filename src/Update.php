@@ -14,4 +14,14 @@ namespace Slendium\Ocd;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-interface Update { }
+interface Update {
+
+	/**
+	 * @since 1.0
+	 * @template R
+	 * @param Update\Visitor<R> $visitor
+	 * @return R
+	 */
+	public function accept(Update\Visitor $visitor): mixed;
+
+}

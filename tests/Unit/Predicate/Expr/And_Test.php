@@ -7,6 +7,8 @@ use PHPUnit\Framework\TestCase;
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate\Expr;
 
+use Slendium\OcdTests\Unit\Predicate\MockVisitor;
+
 /**
  * BC tests. Properties, labeled parameters and constructor defaults should not change.
  *
@@ -23,6 +25,16 @@ final class And_Test extends TestCase {
 
 		$this->assertSame(1, \count($result->inputs));
 		$this->assertSame($expr, $result->inputs[0]);
+	}
+
+	public function test_accept_shouldCallAppropriateMethod(): void {
+		$sut = new Expr\And_([ new Expr\Exists(new FieldPath([ 'test' ])) ]);
+		$called = false;
+		$mock = new MockVisitor([ 'visitAnd' => function() use (&$called) { $called = true; } ]);
+
+		$sut->accept($mock);
+
+		$this->assertTrue($called);
 	}
 
 }

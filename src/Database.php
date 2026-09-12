@@ -41,6 +41,6 @@ interface Database {
 	 * @since 1.0
 	 * @param non-empty-string $name
 	 */
-	public function deleteCollection(string $name): Collection;
+	public function deleteCollection(string $name): void;
 
 }

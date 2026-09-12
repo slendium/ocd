@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Schema;
 
+use Slendium\Ocd\Common\Blob;
+
 /**
  * The fundamental storage types of fields.
  *
@@ -15,6 +17,9 @@ namespace Slendium\Ocd\Schema;
  * @copyright Slendium 2026
  */
 enum StorageClass : string {
+
+	/** @since 1.0 */
+	case Binary = Blob::class;
 
 	/** @since 1.0 */
 	case String = 'string';

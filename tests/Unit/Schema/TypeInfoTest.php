@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 use Slendium\Ocd\Schema\StorageClass;
+use Slendium\Ocd\Schema\Type;
 use Slendium\Ocd\Schema\TypeException;
 use Slendium\Ocd\Schema\TypeInfo;
 
@@ -17,6 +18,8 @@ use Slendium\Ocd\Schema\TypeInfo;
 final class TypeInfoTest extends TestCase {
 
 	public static function getStorageClassValidCases(): iterable { // @phpstan-ignore missingType.iterableValue
+		yield [ TypeInfoTest\BlobType::class, StorageClass::Binary ];
+		yield [ TypeInfoTest\NullableBlobType::class, StorageClass::Binary ];
 		yield [ TypeInfoTest\StringType::class, StorageClass::String ];
 		yield [ TypeInfoTest\NullableStringType::class, StorageClass::String ];
 		yield [ TypeInfoTest\FloatType::class, StorageClass::Float ];

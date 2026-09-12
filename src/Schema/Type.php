@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Schema;
 
+use Slendium\Ocd\Common\Blob;
+
 /**
  * Converts between PHP types and database types.
  *
@@ -19,7 +21,7 @@ interface Type {
 	 *
 	 * @since 1.0
 	 */
-	public function serialize(mixed $value): string|float|int|bool|null;
+	public function serialize(mixed $value): Blob|string|float|int|bool|null;
 
 	/**
 	 * Converts a database-stored representation of a value back into the real value.

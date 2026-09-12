@@ -16,6 +16,7 @@ final readonly class TypeInfo {
 
 	/**
 	 * Returns the base storage class for the given schema type.
+	 * @since 1.0
 	 * @param class-string<Type> $typeClass
 	 */
 	public static function getStorageClass(string $typeClass): StorageClass {

@@ -5,6 +5,8 @@ namespace Slendium\Ocd\Schema;
 use ReflectionNamedType;
 use ReflectionParameter;
 
+use Slendium\Ocd\Common\Blob;
+
 /**
  * Defines a field within a schema.
  *
@@ -76,6 +78,7 @@ final readonly class Field {
 
 		return [
 			'type' => match($type->getName()) {
+				Blob::class => Type\Blob::instance(),
 				'string' => Type\String_::instance(),
 				'float' => Type\Float_::instance(),
 				'int' => Type\Int_::instance(),

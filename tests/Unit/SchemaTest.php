@@ -60,6 +60,15 @@ final class SchemaTest extends TestCase {
 		$this->assertTrue(isset($result['bool']));
 	}
 
+	public function test_fromConstructorParameters_shouldIncludeBlobField_whenDeclaredInConstructor(): void {
+		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithBlobField::class);
+
+		$result = $sut->fields;
+
+		$this->assertSame(1, \count($result));
+		$this->assertTrue(isset($result['blob']));
+	}
+
 	public function test_fromConstructorParameters_shouldNotContainExcludedFields(): void {
 		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithExcludedField::class);
 

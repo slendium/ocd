@@ -4,6 +4,7 @@ namespace Slendium\Ocd\Update\Stmt;
 
 use Override;
 
+use Slendium\Ocd\Common\Blob;
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Update;
 
@@ -23,7 +24,7 @@ final readonly class Set implements Update {
 		public FieldPath $field,
 
 		/** @since 1.0 */
-		public string|float|int|bool|null $value,
+		public Blob|string|float|int|bool|null $value,
 
 	) { }
 

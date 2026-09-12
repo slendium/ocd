@@ -30,6 +30,13 @@ interface Database {
 	public function listCollections(): iterable;
 
 	/**
+	 * Checks if a collection by the given name exists.
+	 * @since 1.0
+	 * @param non-empty-string $name
+	 */
+	public function hasCollection(string $name): bool;
+
+	/**
 	 * Returns a specific collection, assuming it exists.
 	 * @since 1.0
 	 * @param non-empty-string $name

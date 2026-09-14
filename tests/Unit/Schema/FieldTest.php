@@ -39,20 +39,20 @@ final class FieldTest extends TestCase {
 		$_ = $sut->fields[$fieldName];
 	}
 
-	public function test_nullable_shouldBeFalse_whenTypeIsNotNullableAndHasNonNullDefault(): void {
+	public function test_isNullable_shouldBeFalse_whenTypeIsNotNullableAndHasNonNullDefault(): void {
 		$sut = Schema::fromConstructorParameters(FieldTest\NonNullableFieldWithDefaultEntity::class)->fields['defaultString'];
 
-		$resultNullable = $sut->nullable; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
+		$resultNullable = $sut->isNullable; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 		$resultDefaultValue = $sut->defaultValue; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 
 		$this->assertFalse($resultNullable);
 		$this->assertSame('', $resultDefaultValue);
 	}
 
-	public function test_nullable_shouldBeTrue_whenTypeIsNullableButParameterIsRequired(): void {
+	public function test_isNullable_shouldBeTrue_whenTypeIsNullableButParameterIsRequired(): void {
 		$sut = Schema::fromConstructorParameters(FieldTest\NullableFieldEntity::class)->fields['nullableString'];
 
-		$resultNullable = $sut->nullable; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
+		$resultNullable = $sut->isNullable; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 		$resultDefaultValue = $sut->defaultValue; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 
 		$this->assertTrue($resultNullable);
@@ -62,7 +62,7 @@ final class FieldTest extends TestCase {
 	public function test_defaultValue_shouldTakeDeclaredValue_whenTypeIsNullable(): void {
 		$sut = Schema::fromConstructorParameters(FieldTest\NullableFieldWithDefaultEntity::class)->fields['defaultInt'];
 
-		$resultNullable = $sut->nullable; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
+		$resultNullable = $sut->isNullable; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 		$resultDefaultValue = $sut->defaultValue; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 
 		$this->assertTrue($resultNullable);

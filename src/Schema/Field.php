@@ -22,7 +22,7 @@ final readonly class Field {
 		return new self(
 			name: self::extractName($parameter),
 			type: $typeInfo['type'],
-			nullable: $typeInfo['nullable'],
+			isNullable: $typeInfo['isNullable'],
 			defaultValue: $parameter->isOptional()
 				? $parameter->getDefaultValue()
 				: null,
@@ -42,7 +42,7 @@ final readonly class Field {
 		public Type $type,
 
 		/** @since 1.0 */
-		public bool $nullable,
+		public bool $isNullable,
 
 		/** @since 1.0 */
 		public mixed $defaultValue,
@@ -67,7 +67,7 @@ final readonly class Field {
 		return $parameter->name; // @phpstan-ignore return.type (cant be empty string)
 	}
 
-	/** @return array{ type: Type, nullable: bool } */
+	/** @return array{ type: Type, isNullable: bool } */
 	private static function extractTypeInfo(ReflectionParameter $parameter): array {
 		$type = $parameter->getType();
 		if (!($type instanceof ReflectionNamedType)) {
@@ -85,7 +85,7 @@ final readonly class Field {
 				'bool' => Type\Bool_::instance(),
 				default => throw DefinitionException::forUnsupportedFieldType($parameter->name, $type->getName())
 			},
-			'nullable' => $type->allowsNull()
+			'isNullable' => $type->allowsNull()
 				// parameters that default to null without a nullable type are deprecated since PHP 8.5
 				// so this case can be removed when PHP removes support for implied nullable parameters
 				|| $parameter->isOptional() && $parameter->getDefaultValue() === null

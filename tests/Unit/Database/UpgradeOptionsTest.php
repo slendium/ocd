@@ -16,8 +16,7 @@ class UpgradeOptionsTest extends TestCase {
 	public function test___construct_shouldDisallowAllByDefault(): void {
 		$result = new UpgradeOptions;
 
-		$this->assertFalse($result->allowTruncate);
-		$this->assertFalse($result->allowDrop);
+		$this->assertFalse($result->allowLoss);
 	}
 
 }

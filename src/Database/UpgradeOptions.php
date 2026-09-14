@@ -13,29 +13,24 @@ final class UpgradeOptions {
 	public function __construct(
 
 		/**
-		 * Indicates whether to allow truncation of values in existing fields (eg. reducing the size
-		 * of a string or int field).
+		 * Indicates whether to allow any kind of data loss from a schema upgrade.
 		 *
-		 * This only applies to truncatable fields, ie. to fields that have a max. length enforced by the database.
-		 * Strings in schemaless databases or inside JSON structures usually don't have an enforced max. length.
+		 * This applies to both truncation of existing data and dropping whole columns.
 		 *
-		 * Implementations should ignore truncations when set to `false`, ie. keep the field at the
-		 * existing (larger) size.
-		 * A notice should be emitted about data that can be truncated.
+		 * Trunction only needs to be considered for fields with a database-enforced maximum length.
+		 * Strings in schemaless databases or inside JSON structures usually don't have an enforced maximum length.
+		 * When set to `false`, implementations should keep the field size at the existing (larger) size,
+		 * but any other modifications to the field should still be applied.
 		 *
-		 * @since 1.0
-		 */
-		public bool $allowTruncate = false,
-
-		/**
-		 * Indicates wether to allow dropping whole columns or tables.
+		 * The intended use of this option is to allow an upgrade in stages:
 		 *
-		 * Implementations should just keep the data when set to `false`.
-		 * A notice should be emitted about data that can be dropped.
+		 * 1. Run the schema upgrade without data losses, adding new columns and tables.
+		 * 2. Convert and move existing data into the new columns and tables.
+		 * 3. Rerun the schema upgrade, now with data losses allowed, to clean up unused columns and tables.
 		 *
 		 * @since 1.0
 		 */
-		public bool $allowDrop = false,
+		public bool $allowLoss = false,
 
 	) { }
 

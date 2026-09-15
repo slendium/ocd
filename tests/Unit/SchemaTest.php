@@ -148,12 +148,12 @@ final class SchemaTest extends TestCase {
 		}
 	}
 
-	public function test_idOptions_generator_shouldNotHaveIdGenerator_whenEntityIsNotIdentifiable(): void {
+	public function test_idOptions_shouldBeNull_whenEntityIsNotIdentifiable(): void {
 		$sut = Schema::fromConstructorParameters(SchemaTest\EmptyEntity::class);
 
-		$result = $sut->idOptions->generator;
+		$result = $sut->idOptions;
 
-		$this->assertSame(Schema\IdGenerator::None, $result);
+		$this->assertNull($result);
 	}
 
 	public function test_fields_shouldContainIdField_whenEntityDeclaresIdFieldButIsNotIdentifiable(): void {

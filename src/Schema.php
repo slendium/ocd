@@ -61,7 +61,6 @@ final readonly class Schema {
 				throw Schema\DefinitionException::forMissingIdField();
 			}
 
-			$idOptions ??= new Schema\IdOptions(Schema\IdGenerator::None);
 			$object->__construct($idOptions, $fields);
 		});
 	}
@@ -84,7 +83,7 @@ final readonly class Schema {
 	private function __construct(
 
 		/** @since 1.0 */
-		public Schema\IdOptions $idOptions,
+		public ?Schema\IdOptions $idOptions,
 
 		iterable $fields,
 

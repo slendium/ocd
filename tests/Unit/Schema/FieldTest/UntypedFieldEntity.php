@@ -2,6 +2,8 @@
 
 namespace Slendium\OcdTests\Unit\Schema\FieldTest;
 
+use Override;
+
 use Slendium\Ocd\Entity;
 
 /**
@@ -13,7 +15,14 @@ final readonly class UntypedFieldEntity implements Entity {
 
 	public mixed $untyped;
 
-	public function __construct($untyped) { // @phpstan-ignore missingType.parameter (deliberate for test purposes)
+	public function __construct( // @phpstan-ignore missingType.parameter (deliberate for test purposes)
+
+		#[Override]
+		public readonly Entity\Id $id,
+
+		$untyped,
+
+	) {
 		$this->untyped = $untyped;
 	}
 

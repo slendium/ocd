@@ -2,6 +2,8 @@
 
 namespace Slendium\OcdTests\Unit\Schema\FieldTest;
 
+use Override;
+
 use Slendium\Ocd\Entity;
 
 /**
@@ -13,6 +15,13 @@ final readonly class NonRenamedFieldEntity implements Entity {
 
 	const FIELD_NAME = 'field';
 
-	public function __construct(public string $field) { }
+	public function __construct(
+
+		#[Override]
+		public readonly Entity\Id $id,
+
+		public string $field,
+
+	) { }
 
 }

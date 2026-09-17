@@ -12,11 +12,11 @@ use Slendium\Ocd\Schema;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class IdentifiableEntityWithSequentialId implements Entity, Entity\Identifiable {
+final readonly class EntityThatExcludesId implements Entity {
 
 	public function __construct(
 
-		#[Override, Schema\IdOptions(Schema\IdGenerator::Sequence)]
+		#[Override, Schema\Exclude]
 		public Entity\Id $id,
 
 	) { }

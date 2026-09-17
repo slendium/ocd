@@ -4,6 +4,7 @@ namespace Slendium\OcdTests\Unit\Schema\FieldTest;
 
 use ArrayAccess;
 use Countable;
+use Override;
 
 use Slendium\Ocd\Entity;
 
@@ -15,6 +16,9 @@ use Slendium\Ocd\Entity;
 final readonly class IntersectionTypedFieldEntity implements Entity {
 
 	public function __construct(
+
+		#[Override]
+		public readonly Entity\Id $id,
 
 		/** @var ArrayAccess<string,mixed>&Countable */
 		public ArrayAccess&Countable $intersection,

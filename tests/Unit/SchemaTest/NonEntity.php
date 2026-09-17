@@ -2,28 +2,23 @@
 
 namespace Slendium\OcdTests\Unit\SchemaTest;
 
-use Override;
-
-use Slendium\Ocd\Entity;
-
 /**
  * @internal
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final class NonEntity implements Entity\Identifiable {
+final readonly class NonEntity {
 
-	#[Override]
-	public readonly Entity\Id $id;
+	public function __construct(
 
-	public string $name;
+		public string $name,
 
-	public int $counter;
+		public float $factor,
 
-	public function __construct(Entity\Id $id, string $name, int $counter) {
-		$this->id = $id;
-		$this->name = $name;
-		$this->counter = $counter;
-	}
+		public int $count,
+
+		public bool $flag,
+
+	) { }
 
 }

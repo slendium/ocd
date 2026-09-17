@@ -2,6 +2,8 @@
 
 namespace Slendium\OcdTests\Unit\Schema\FieldTest;
 
+use Override;
+
 use Slendium\Ocd\Entity;
 
 /**
@@ -11,7 +13,14 @@ use Slendium\Ocd\Entity;
  */
 final readonly class NullableFieldEntity implements Entity {
 
-	public function __construct(public ?string $nullableString) { }
+	public function __construct(
+
+		#[Override]
+		public readonly Entity\Id $id,
+
+		public ?string $nullableString,
+
+	) { }
 
 
 }

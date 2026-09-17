@@ -12,7 +12,7 @@ use Slendium\Ocd\Schema;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class EntityWithRenamedField implements Entity, Entity\Identifiable {
+final readonly class EntityWithRenamedField implements Entity {
 
 	public function __construct(
 

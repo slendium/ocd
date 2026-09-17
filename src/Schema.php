@@ -45,7 +45,7 @@ final readonly class Schema {
 	 */
 	public static function fromConstructorParameters(string $class): self {
 		return new ReflectionClass(self::class)->newLazyGhost(static function (self $object) use ($class) {
-			$isIdentifiable = \is_a($class, Entity\Identifiable::class, allow_string: true);
+			$isIdentifiable = \is_a($class, Entity::class, allow_string: true);
 
 			$idOptions = null;
 			$fields = [ ];

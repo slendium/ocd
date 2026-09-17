@@ -18,31 +18,20 @@ final class SchemaTest extends TestCase {
 
 	private const DEFAULT_ID_GENERATOR = Schema\IdGenerator::UniqueIdentifier;
 
-	public function test_createFromConstructorParameters_shouldThrow_whenEntityIsIdentifiableButDoesNotDeclareAnIdParameter(): void {
-		// Arrange
-		$sut = Schema::fromConstructorParameters(SchemaTest\IdentifiableEntityWithoutIdParameter::class);
-
-		// Assert
-		$this->expectException(Schema\DefinitionException::class);
-
-		// Act
-		$_ = $sut->fields;
-	}
-
-	public function test_fromConstructorParameters_shouldSetDefaultIdGeneratorWithoutIdField_whenEntityIsIdentifiableAndDeclaresIdField(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EmptyIdentifiableEntity::class);
+	public function test_fromConstructorParameters_shouldSetDefaultIdGenerator(): void {
+		$sut = Schema::fromConstructorParameters(SchemaTest\EmptyEntity::class);
 
 		$resultIdOptions = $sut->idOptions;
 		$resultFields = $sut->fields;
 
-		$this->assertSame(self::DEFAULT_ID_GENERATOR, $resultIdOptions->generator);
+		$this->assertSame(self::DEFAULT_ID_GENERATOR, $resultIdOptions?->generator);
 		$this->assertFalse(isset($resultFields['id']));
 	}
 
 	public function test_fromConstructorParameters_shouldIgnoreExcludeAttributeAndSetDefaultGenerator_whenExcludeAttributeIsAppliedToId(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\IdentifiableEntityThatExcludesId::class);
+		$sut = Schema::fromConstructorParameters(SchemaTest\EntityThatExcludesId::class);
 
-		$result = $sut->idOptions->generator;
+		$result = $sut->idOptions?->generator;
 
 		$this->assertSame(self::DEFAULT_ID_GENERATOR, $result);
 	}
@@ -52,7 +41,7 @@ final class SchemaTest extends TestCase {
 
 		$result = $sut->fields;
 
-		$this->assertSame(self::DEFAULT_ID_GENERATOR, $sut->idOptions->generator);
+		$this->assertSame(self::DEFAULT_ID_GENERATOR, $sut->idOptions?->generator);
 		$this->assertSame(4, \count($result));
 		$this->assertTrue(isset($result['string']));
 		$this->assertTrue(isset($result['float']));
@@ -79,17 +68,16 @@ final class SchemaTest extends TestCase {
 		$this->assertFalse(isset($result['excluded']));
 	}
 
-	// Allowed, but not recommended
-	public function test_fromConstructorParameters_shouldNotThrow_whenObjectDoesNotImplementEntity(): void {
+	public function test_fromConstructorParameters_shouldFindAllFields_whenCalledWithNonEntity(): void {
 		$sut = Schema::fromConstructorParameters(SchemaTest\NonEntity::class);
 
-		$resultIdOptions = $sut->idOptions;
-		$resultFields = $sut->fields;
+		$result = $sut->fields;
 
-		$this->assertSame(self::DEFAULT_ID_GENERATOR, $resultIdOptions->generator);
-		$this->assertSame(2, \count($resultFields));
-		$this->assertTrue(isset($resultFields['name']));
-		$this->assertTrue(isset($resultFields['counter']));
+		$this->assertSame(4, \count($result));
+		$this->assertTrue(isset($result['name']));
+		$this->assertTrue(isset($result['factor']));
+		$this->assertTrue(isset($result['count']));
+		$this->assertTrue(isset($result['flag']));
 	}
 
 	public function test_fields_shouldRenameFields_whenDeclaredWithFieldNameAttribute(): void {
@@ -148,16 +136,16 @@ final class SchemaTest extends TestCase {
 		}
 	}
 
-	public function test_idOptions_shouldBeNull_whenEntityIsNotIdentifiable(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EmptyEntity::class);
+	public function test_idOptions_shouldBeNull_whenNonEntity(): void {
+		$sut = Schema::fromConstructorParameters(SchemaTest\EmptyObject::class);
 
 		$result = $sut->idOptions;
 
 		$this->assertNull($result);
 	}
 
-	public function test_fields_shouldContainIdField_whenEntityDeclaresIdFieldButIsNotIdentifiable(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithRegularIdField::class);
+	public function test_fields_shouldContainIdField_whenGenericObjectDeclaresIdField(): void {
+		$sut = Schema::fromConstructorParameters(SchemaTest\ObjectWithIdField::class);
 
 		$result = $sut->fields;
 
@@ -184,9 +172,9 @@ final class SchemaTest extends TestCase {
 	}
 
 	public function test_idOptions_generator_shouldHaveNonDefaultGenerator_whenEntityDeclaresIdOptions(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\IdentifiableEntityWithSequentialId::class);
+		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithSequentialId::class);
 
-		$result = $sut->idOptions->generator;
+		$result = $sut->idOptions?->generator;
 
 		$this->assertSame(Schema\IdGenerator::Sequence, $result);
 	}

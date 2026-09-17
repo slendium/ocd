@@ -2,6 +2,8 @@
 
 namespace Slendium\OcdTests\Unit\Schema\FieldTest;
 
+use Override;
+
 use Slendium\Ocd\Entity;
 
 /**
@@ -13,6 +15,13 @@ final readonly class NullableFieldWithDefaultEntity implements Entity {
 
 	const DEFAULT_VALUE = 67;
 
-	public function __construct(public ?int $defaultInt = self::DEFAULT_VALUE) { }
+	public function __construct(
+
+		#[Override]
+		public readonly Entity\Id $id,
+
+		public ?int $defaultInt = self::DEFAULT_VALUE,
+
+	) { }
 
 }

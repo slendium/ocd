@@ -11,7 +11,7 @@ use Slendium\Ocd\Entity;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class EntityWithScalarFields implements Entity, Entity\Identifiable {
+final readonly class EntityWithScalarFields implements Entity {
 
 	public function __construct(
 

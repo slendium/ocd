@@ -2,6 +2,8 @@
 
 namespace Slendium\OcdTests\Unit\Schema\FieldTest;
 
+use Override;
+
 use Slendium\Ocd\Entity;
 
 /**
@@ -13,7 +15,14 @@ final readonly class CallableFieldEntity implements Entity {
 
 	public mixed $result;
 
-	public function __construct(callable $callable) {
+	public function __construct(
+
+		#[Override]
+		public readonly Entity\Id $id,
+
+		callable $callable,
+
+	) {
 		$this->result = $callable();
 	}
 

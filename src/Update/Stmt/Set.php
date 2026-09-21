@@ -24,7 +24,7 @@ final readonly class Set implements Update {
 		public FieldPath $field,
 
 		/** @since 1.0 */
-		public Blob|string|float|int|bool|null $value,
+		public mixed $value,
 
 	) { }
 

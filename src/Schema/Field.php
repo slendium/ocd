@@ -2,6 +2,10 @@
 
 namespace Slendium\Ocd\Schema;
 
+use BackedEnum;
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use ReflectionNamedType;
 use ReflectionParameter;
 
@@ -77,19 +81,36 @@ final readonly class Field {
 		}
 
 		return [
-			'type' => match($type->getName()) {
-				Blob::class => Type\Blob::instance(),
-				'string' => Type\String_::instance(),
-				'float' => Type\Float_::instance(),
-				'int' => Type\Int_::instance(),
-				'bool' => Type\Bool_::instance(),
-				default => throw DefinitionException::forUnsupportedFieldType($parameter->name, $type->getName())
-			},
+			'type' => self::getSchemaTypeForDeclaredType($type->getName())
+				?? throw DefinitionException::forUnsupportedFieldType($parameter->name, $type->getName()),
 			'isNullable' => $type->allowsNull()
 				// parameters that default to null without a nullable type are deprecated since PHP 8.5
 				// so this case can be removed when PHP removes support for implied nullable parameters
 				|| $parameter->isOptional() && $parameter->getDefaultValue() === null
 		];
+	}
+
+	private static function getSchemaTypeForDeclaredType(string $type): ?Type {
+		return match($type) {
+			Blob::class => Type\Blob::instance(),
+			DateTime::class => Types\DateTimeMutable::instance(),
+			DateTimeImmutable::class => Types\DateTime::instance(),
+			DateTimeInterface::class => Types\DateTime::instance(),
+			'array' => new Types\Map,
+			'string' => Type\String_::instance(),
+			'float' => Type\Float_::instance(),
+			'int' => Type\Int_::instance(),
+			'bool' => Type\Bool_::instance(),
+			default => self::getSchemaTypeForDeclaredClass($type)
+		};
+	}
+
+	private static function getSchemaTypeForDeclaredClass(string $class): ?Type {
+		if (\is_a($class, BackedEnum::class, allow_string: true)) {
+			return new Types\Enumeration;
+		}
+
+		return null;
 	}
 
 }

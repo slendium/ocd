@@ -2,7 +2,9 @@
 
 namespace Slendium\Ocd\Predicate;
 
+use BackedEnum;
 use Closure;
+use DateTimeInterface;
 
 use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Predicate;
@@ -21,6 +23,7 @@ use Slendium\Ocd\Schema\StorageClass;
  * $query = Q::shape([
  * 	'name' => Q::regex('^pen'),
  * 	'category' => 'OfficeSupplies',
+ * 	'published' => Q::onOrBefore(new DateTime),
  * 	'stock' => Q::gt(0),
  * 	'visible' => true,
  * 	'stores' => Q::isNonEmpty(),
@@ -50,7 +53,7 @@ final class DocumentShape {
 
 	/**
 	 * @since 1.0
-	 * @param non-empty-array<non-empty-string,(Closure(FieldPath):Predicate)|string|float|int|bool|null> $shape
+	 * @param non-empty-array<non-empty-string,(Closure(FieldPath):Predicate)|DateTimeInterface|BackedEnum|string|float|int|bool|null> $shape
 	 */
 	public static function shape(array $shape): Expr\And_ {
 		$inputs = [ ];
@@ -64,7 +67,7 @@ final class DocumentShape {
 
 	/**
 	 * @since 1.0
-	 * @param non-empty-array<non-empty-string,(Closure(FieldPath):Predicate)|string|float|int|bool|null> $shape
+	 * @param non-empty-array<non-empty-string,(Closure(FieldPath):Predicate)|DateTimeInterface|BackedEnum|string|float|int|bool|null> $shape
 	 * @return Closure(FieldPath):Expr\And_
 	 */
 	public static function and(array $shape): Closure {
@@ -73,7 +76,7 @@ final class DocumentShape {
 
 	/**
 	 * @since 1.0
-	 * @param non-empty-array<non-empty-string,(Closure(FieldPath):Predicate)|string|float|int|bool|null> $shape
+	 * @param non-empty-array<non-empty-string,(Closure(FieldPath):Predicate)|DateTimeInterface|BackedEnum|string|float|int|bool|null> $shape
 	 * @return Closure(FieldPath):Expr\Or_
 	 */
 	public static function or(array $shape): Closure {
@@ -84,7 +87,7 @@ final class DocumentShape {
 	 * @since 1.0
 	 * @return Closure(FieldPath):Expr\Equal
 	 */
-	public static function eq(string|float|int|bool|null $rhs): Closure {
+	public static function eq(DateTimeInterface|BackedEnum|string|float|int|bool|null $rhs): Closure {
 		return static fn(FieldPath $field) => new Expr\Equal($field, $rhs);
 	}
 
@@ -92,7 +95,7 @@ final class DocumentShape {
 	 * @since 1.0
 	 * @return Closure(FieldPath):Expr\NotEqual
 	 */
-	public static function notEqual(string|float|int|bool|null $rhs): Closure {
+	public static function notEqual(DateTimeInterface|BackedEnum|string|float|int|bool|null $rhs): Closure {
 		return static fn(FieldPath $field) => new Expr\NotEqual($field, $rhs);
 	}
 
@@ -130,7 +133,7 @@ final class DocumentShape {
 
 	/**
 	 * @since 1.0
-	 * @param non-empty-list<string|float|int|bool|null> $values
+	 * @param non-empty-list<DateTimeInterface|BackedEnum|string|float|int|bool|null> $values
 	 * @return Closure(FieldPath):Expr\MatchAll
 	 */
 	public static function matchAll(array $values): Closure {
@@ -139,7 +142,7 @@ final class DocumentShape {
 
 	/**
 	 * @since 1.0
-	 * @param non-empty-list<string|float|int|bool|null> $values
+	 * @param non-empty-list<DateTimeInterface|BackedEnum|string|float|int|bool|null> $values
 	 * @return Closure(FieldPath):Expr\MatchSome
 	 */
 	public static function matchSome(array $values): Closure {
@@ -148,7 +151,7 @@ final class DocumentShape {
 
 	/**
 	 * @since 1.0
-	 * @param non-empty-list<string|float|int|bool|null> $values
+	 * @param non-empty-list<DateTimeInterface|BackedEnum|string|float|int|bool|null> $values
 	 * @return Closure(FieldPath):Expr\MatchNone
 	 */
 	public static function matchNone(array $values): Closure {
@@ -196,6 +199,38 @@ final class DocumentShape {
 
 	/**
 	 * @since 1.0
+	 * @return Closure(FieldPath):Expr\LessThan
+	 */
+	public static function before(DateTimeInterface $at): Closure {
+		return static fn(FieldPath $field) => new Expr\LessThan($field, $at);
+	}
+
+	/**
+	 * @since 1.0
+	 * @return Closure(FieldPath):Expr\LessThanOrEqual
+	 */
+	public static function onOrBefore(DateTimeInterface $at): Closure {
+		return static fn(FieldPath $field) => new Expr\LessThanOrEqual($field, $at);
+	}
+
+	/**
+	 * @since 1.0
+	 * @return Closure(FieldPath):Expr\GreaterThan
+	 */
+	public static function after(DateTimeInterface $at): Closure {
+		return static fn(FieldPath $field) => new Expr\GreaterThan($field, $at);
+	}
+
+	/**
+	 * @since 1.0
+	 * @return Closure(FieldPath):Expr\GreaterThanOrEqual
+	 */
+	public static function onOrAfter(DateTimeInterface $at): Closure {
+		return static fn(FieldPath $field) => new Expr\GreaterThanOrEqual($field, $at);
+	}
+
+	/**
+	 * @since 1.0
 	 * @return Closure(FieldPath):Expr\IsOfType
 	 */
 	public static function isOfType(StorageClass $type): Closure {
@@ -234,7 +269,7 @@ final class DocumentShape {
 	}
 
 	/**
-	 * @param non-empty-array<non-empty-string,(Closure(FieldPath):Predicate)|string|float|int|bool|null> $shape
+	 * @param non-empty-array<non-empty-string,(Closure(FieldPath):Predicate)|DateTimeInterface|BackedEnum|string|float|int|bool|null> $shape
 	 * @return non-empty-list<Predicate>
 	 */
 	private static function resolveInnerShape(FieldPath $basePath, array $shape): array {

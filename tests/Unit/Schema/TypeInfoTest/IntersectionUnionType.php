@@ -2,6 +2,7 @@
 
 namespace Slendium\OcdTests\Unit\Schema\TypeInfoTest;
 
+use DateTimeInterface;
 use Exception;
 use Override;
 
@@ -12,10 +13,10 @@ use Slendium\Ocd\Schema\Type;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-class UnionType implements Type {
+class IntersectionUnionType implements Type {
 
 	#[Override]
-	public function serialize(mixed $value): float|int {
+	public function serialize(mixed $value): (Type\SerializeException&DateTimeInterface)|null {
 		throw new Exception('Not implemented');
 	}
 

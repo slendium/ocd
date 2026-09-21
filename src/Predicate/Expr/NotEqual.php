@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use BackedEnum;
+use DateTimeInterface;
 use Override;
 
 use Slendium\Ocd\Common\FieldPath;
@@ -20,10 +22,10 @@ final readonly class NotEqual implements Predicate {
 	public function __construct(
 
 		/** @since 1.0 */
-		public FieldPath|string|float|int|bool|null $lhs,
+		public FieldPath|DateTimeInterface|BackedEnum|string|float|int|bool|null $lhs,
 
 		/** @since 1.0 */
-		public FieldPath|string|float|int|bool|null $rhs,
+		public FieldPath|DateTimeInterface|BackedEnum|string|float|int|bool|null $rhs,
 
 	) { }
 

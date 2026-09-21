@@ -15,12 +15,24 @@ use Slendium\Ocd\Schema;
  */
 final class FieldTest extends TestCase {
 
+	public function test_fromParameter_shouldNotThrowForAnyBuiltinType(): void {
+		// Assert
+		$this->expectNotToPerformAssertions();
+
+		// Act
+		foreach (Schema::fromConstructorParameters(FieldTest\BuiltinTypesEntity::class)->fields as $field) {
+			$_ = $field->type;
+		}
+	}
+
 	public static function definitionExceptionCases(): iterable { // @phpstan-ignore missingType.iterableValue
 		yield [ FieldTest\CallableFieldEntity::class, 'callable' ];
 		yield [ FieldTest\MixedFieldEntity::class, 'mixed' ];
 		yield [ FieldTest\UntypedFieldEntity::class, 'untyped' ];
 		yield [ FieldTest\UnionTypedFieldEntity::class, 'union' ];
 		yield [ FieldTest\IntersectionTypedFieldEntity::class, 'intersection' ];
+		yield [ FieldTest\IntersectionUnionTypedFieldEntity::class, 'intersection+union' ];
+		yield [ FieldTest\UnitEnumFieldEntity::class, 'UnitEnum' ];
 	}
 
 	/**

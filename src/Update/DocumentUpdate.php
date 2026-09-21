@@ -25,7 +25,7 @@ use Slendium\Ocd\Update\Stmt;
  * 		SET::if($text !== '', SET::path([ 'texts' ], SET::append([ $text ]))),
  * 		SET::path([ 'sumOfScores' ], SET::add(0.8)),
  * 		SET::path([ 'count' ], SET::add(1))
- *	)
+ * 	)
  * ]);
  * ```
  *
@@ -38,21 +38,24 @@ final class DocumentUpdate {
 	/**
 	 * Creates a list of document updates.
 	 *
-	 * Literal values (ie. non-closures) will be converted to a {@see Stmt\Set} statement.
+	 * Each field update must either be a literal value to set or a `Closure(FieldPath):iterable<Update>`.
+	 * Any non-closure value will be converted to a {@see Stmt\Set} instance.
 	 *
 	 * @since 1.0
-	 * @param non-empty-array<non-empty-string,(Closure(FieldPath):iterable<Update>)|string|float|int|bool|null> $specs
+	 * @param non-empty-array<non-empty-string,mixed> $specs
 	 * @return list<Update>
 	 */
 	public static function create(array $specs): array {
 		$out = [ ];
 		foreach ($specs as $field => $spec) {
-			if (!($spec instanceof Closure)) {
-				$out[] = new Stmt\Set(new FieldPath([ $field ]), $spec);
-			} else {
-				foreach ($spec(new FieldPath([ $field ])) as $stmt) {
+			if ($spec instanceof Closure) {
+				/** @var Closure(FieldPath):iterable<Update> $spec */
+				$stmts = $spec(new FieldPath([ $field ]));
+				foreach ($stmts as $stmt) {
 					$out[] = $stmt;
 				}
+			} else {
+				$out[] = new Stmt\Set(new FieldPath([ $field ]), $spec);
 			}
 		}
 		return $out;
@@ -62,7 +65,7 @@ final class DocumentUpdate {
 	 * @since 1.0
 	 * @return Closure(FieldPath):iterable<Stmt\Set>
 	 */
-	public static function set(string|float|int|bool|null $value): Closure {
+	public static function set(mixed $value): Closure {
 		return static fn(FieldPath $field) => yield new Stmt\Set($field, $value);
 	}
 
@@ -94,7 +97,7 @@ final class DocumentUpdate {
 	 * @since 1.0
 	 * @return Closure(FieldPath):iterable<Stmt\Append>
 	 */
-	public static function append(string|float|int|bool|null $value): Closure {
+	public static function append(mixed $value): Closure {
 		return static fn(FieldPath $field) => yield new Stmt\Append($field, $value);
 	}
 

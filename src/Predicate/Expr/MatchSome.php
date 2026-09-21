@@ -2,6 +2,8 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use BackedEnum;
+use DateTimeInterface;
 use Override;
 
 use Slendium\Ocd\Common\FieldPath;
@@ -26,7 +28,7 @@ final readonly class MatchSome implements Predicate {
 
 		/**
 		 * @since 1.0
-		 * @var non-empty-list<string|float|int|bool|null>
+		 * @var non-empty-list<DateTimeInterface|BackedEnum|string|float|int|bool|null>
 		 */
 		public array $values,
 

@@ -2,6 +2,8 @@
 
 namespace Slendium\OcdTests\Unit\Predicate;
 
+use DateTime;
+
 use PHPUnit\Framework\TestCase;
 
 use Slendium\Ocd\Common\FieldPath;
@@ -249,6 +251,54 @@ final class DocumentShapeTest extends TestCase {
 			}
 		}
 		$this->assertTrue($checkExists);
+	}
+
+	public function test_before_shouldProduceValidPredicate(): void {
+		$expectedResult = new DateTime;
+		$field = 'foo';
+		$sut = Q::before($expectedResult);
+
+		$result = $sut(new FieldPath([ $field ]));
+
+		$this->assertInstanceOf(FieldPath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertSame($expectedResult, $result->rhs);
+	}
+
+	public function test_onOrBefore_shouldProduceValidPredicate(): void {
+		$expectedResult = new DateTime;
+		$field = 'foo';
+		$sut = Q::onOrBefore($expectedResult);
+
+		$result = $sut(new FieldPath([ $field ]));
+
+		$this->assertInstanceOf(FieldPath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertSame($expectedResult, $result->rhs);
+	}
+
+	public function test_after_shouldProduceValidPredicate(): void {
+		$expectedResult = new DateTime;
+		$field = 'foo';
+		$sut = Q::after($expectedResult);
+
+		$result = $sut(new FieldPath([ $field ]));
+
+		$this->assertInstanceOf(FieldPath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertSame($expectedResult, $result->rhs);
+	}
+
+	public function test_onOrAfter_shouldProduceValidPredicate(): void {
+		$expectedResult = new DateTime;
+		$field = 'foo';
+		$sut = Q::onOrAfter($expectedResult);
+
+		$result = $sut(new FieldPath([ $field ]));
+
+		$this->assertInstanceOf(FieldPath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertSame($expectedResult, $result->rhs);
 	}
 
 	public function test_isOfType_shouldProduceValidPredicate(): void {

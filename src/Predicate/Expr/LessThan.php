@@ -2,6 +2,7 @@
 
 namespace Slendium\Ocd\Predicate\Expr;
 
+use DateTimeInterface;
 use Override;
 
 use Slendium\Ocd\Common\FieldPath;
@@ -20,10 +21,10 @@ final readonly class LessThan implements Predicate {
 	public function __construct(
 
 		/** @since 1.0 */
-		public FieldPath|float|int $lhs,
+		public FieldPath|DateTimeInterface|float|int $lhs,
 
 		/** @since 1.0 */
-		public FieldPath|float|int $rhs,
+		public FieldPath|DateTimeInterface|float|int $rhs,
 
 	) { }
 

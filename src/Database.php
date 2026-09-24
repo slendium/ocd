@@ -12,17 +12,6 @@ namespace Slendium\Ocd;
 interface Database {
 
 	/**
-	 * Enforces the given schema for the given collection, creating one if it does not yet exist.
-	 *
-	 * {@see Database\UpgradeOptions} can be used for more control over the behavior of the schema
-	 * upgrade, such as which - if any - data losses to allow.
-	 *
-	 * @since 1.0
-	 * @param non-empty-string $collection
-	 */
-	public function enforceSchema(string $collection, Schema $schema): Database\UpgradeCommand;
-
-	/**
 	 * Returns all existing collections.
 	 * @since 1.0
 	 * @return list<non-empty-string>

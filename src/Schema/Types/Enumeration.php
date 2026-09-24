@@ -2,19 +2,30 @@
 
 namespace Slendium\Ocd\Schema\Types;
 
+use Attribute;
 use BackedEnum;
 use Override;
 
 use Slendium\Ocd\Schema\Type;
 
 /**
- * @internal
+ * @since 1.0
  * @author C. Fahner
  * @copyright Slendium 2026
  */
+#[Attribute(Attribute::TARGET_PARAMETER)]
 final class Enumeration implements Type {
 
-	// TODO: limit each instance to a specific BackedEnum type and reuse these instances
+	/** @since 1.0 */
+	public function __construct(
+
+		/**
+		 * @since 1.0
+		 * @var class-string<BackedEnum>
+		 */
+		public readonly string $backedEnumClass,
+
+	) { }
 
 	#[Override]
 	public function serialize(mixed $value): BackedEnum {

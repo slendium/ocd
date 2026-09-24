@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 use Slendium\Ocd\Entity;
 use Slendium\Ocd\Schema;
+use Slendium\Ocd\Schema\Type\CharacterLimited;
 
 /**
  * @internal
@@ -25,14 +26,25 @@ final class FieldTest extends TestCase {
 		}
 	}
 
+	public function test_fromParameter_shouldNotThrowForAnyOverrideType(): void {
+		// Assert
+		$this->expectNotToPerformAssertions();
+
+		// Act
+		foreach (Schema::fromConstructorParameters(FieldTest\BuiltinTypesAsAttributesEntity::class)->fields as $field) {
+			$_ = $field->type;
+		}
+	}
+
 	public static function definitionExceptionCases(): iterable { // @phpstan-ignore missingType.iterableValue
-		yield [ FieldTest\CallableFieldEntity::class, 'callable' ];
-		yield [ FieldTest\MixedFieldEntity::class, 'mixed' ];
-		yield [ FieldTest\UntypedFieldEntity::class, 'untyped' ];
-		yield [ FieldTest\UnionTypedFieldEntity::class, 'union' ];
-		yield [ FieldTest\IntersectionTypedFieldEntity::class, 'intersection' ];
-		yield [ FieldTest\IntersectionUnionTypedFieldEntity::class, 'intersection+union' ];
-		yield [ FieldTest\UnitEnumFieldEntity::class, 'UnitEnum' ];
+		yield 'callable' => [ FieldTest\CallableFieldEntity::class, 'callable' ];
+		yield 'mixed' => [ FieldTest\MixedFieldEntity::class, 'mixed' ];
+		yield 'untyped' => [ FieldTest\UntypedFieldEntity::class, 'untyped' ];
+		yield 'union' => [ FieldTest\UnionTypedFieldEntity::class, 'union' ];
+		yield 'intersection' => [ FieldTest\IntersectionTypedFieldEntity::class, 'intersection' ];
+		yield 'intersection+union' => [ FieldTest\IntersectionUnionTypedFieldEntity::class, 'intersectionUnion' ];
+		yield 'unit-enum' => [ FieldTest\UnitEnumFieldEntity::class, 'enumeration' ];
+		yield 'too-many-types' => [ FieldTest\TooManyTypesFieldEntity::class, 'tooMany' ];
 	}
 
 	/**

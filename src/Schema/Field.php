@@ -6,6 +6,7 @@ use BackedEnum;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use ReflectionAttribute;
 use ReflectionNamedType;
 use ReflectionParameter;
 
@@ -73,6 +74,18 @@ final readonly class Field {
 
 	/** @return array{ type: Type, isNullable: bool } */
 	private static function extractTypeInfo(ReflectionParameter $parameter): array {
+		$typeAttrs = $parameter->getAttributes(Type::class, ReflectionAttribute::IS_INSTANCEOF);
+		if (\count($typeAttrs) > 1) {
+			throw DefinitionException::forTooManyTypes($parameter->name);
+		}
+
+		foreach ($typeAttrs as $attr) {
+			return [
+				'type' => $attr->newInstance(),
+				'isNullable' => $parameter->getType()?->allowsNull() ?? false
+			];
+		}
+
 		$type = $parameter->getType();
 		if (!($type instanceof ReflectionNamedType)) {
 			throw $type === null
@@ -92,22 +105,22 @@ final readonly class Field {
 
 	private static function getSchemaTypeForDeclaredType(string $type): ?Type {
 		return match($type) {
-			Blob::class => Type\Blob::instance(),
+			Blob::class => Types\Blob::instance(),
 			DateTime::class => Types\DateTimeMutable::instance(),
 			DateTimeImmutable::class => Types\DateTime::instance(),
 			DateTimeInterface::class => Types\DateTime::instance(),
 			'array' => new Types\Map,
-			'string' => Type\String_::instance(),
-			'float' => Type\Float_::instance(),
-			'int' => Type\Int_::instance(),
-			'bool' => Type\Bool_::instance(),
+			'string' => Types\String_::instance(),
+			'float' => Types\Float_::instance(),
+			'int' => Types\Int_::instance(),
+			'bool' => Types\Bool_::instance(),
 			default => self::getSchemaTypeForDeclaredClass($type)
 		};
 	}
 
 	private static function getSchemaTypeForDeclaredClass(string $class): ?Type {
 		if (\is_a($class, BackedEnum::class, allow_string: true)) {
-			return new Types\Enumeration;
+			return new Types\Enumeration($class);
 		}
 
 		return null;

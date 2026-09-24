@@ -26,6 +26,11 @@ class DefinitionException extends Exception {
 	}
 
 	/** @internal */
+	public static function forTooManyTypes(string $name): self {
+		return new self("Expected only one schema type for field `$name`");
+	}
+
+	/** @internal */
 	public static function forMissingIdField(): self {
 		return new self('Expected a field named `id` of type `'.Id::class.'` for identifiable entity');
 	}

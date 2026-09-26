@@ -7,10 +7,13 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use ReflectionAttribute;
+use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
 
 use Slendium\Ocd\Common\Blob;
+use Slendium\Ocd\Common\SequentialValue;
+use Slendium\Ocd\Common\UniqueIdentifier;
 
 /**
  * Defines a field within a schema.
@@ -21,27 +24,32 @@ use Slendium\Ocd\Common\Blob;
  */
 final readonly class Field {
 
+	/**
+	 * @since 1.0
+	 * @var non-empty-string
+	 */
+	public string $name; // @phpstan-ignore property.uninitializedReadonly (fromParameter always assigns it)
+
 	/** @internal */
 	public static function fromParameter(ReflectionParameter $parameter): self {
-		$typeInfo = self::extractTypeInfo($parameter);
-		return new self(
-			name: self::extractName($parameter),
-			type: $typeInfo['type'],
-			isNullable: $typeInfo['isNullable'],
-			defaultValue: $parameter->isOptional()
-				? $parameter->getDefaultValue()
-				: null,
-			originalName: $parameter->name, // @phpstan-ignore argument.type (never non-empty)
-		);
+		$classReflector = new ReflectionClass(self::class);
+		$field = $classReflector->newLazyGhost(static function(self $object) use ($parameter) {
+			$object->__construct(
+				type: self::extractTypeInfo($parameter),
+				isNullable: $parameter->allowsNull(),
+				defaultValue: $parameter->isOptional()
+					? $parameter->getDefaultValue()
+					: null,
+				originalName: $parameter->name, // @phpstan-ignore argument.type (never non-empty)
+			);
+		});
+
+		$classReflector->getProperty('name')
+			->setRawValueWithoutLazyInitialization($field, self::extractName($parameter));
+		return $field;
 	}
 
 	private function __construct(
-
-		/**
-		 * @since 1.0
-		 * @var non-empty-string
-		 */
-		public string $name,
 
 		/** @since 1.0 */
 		public Type $type,
@@ -72,18 +80,14 @@ final readonly class Field {
 		return $parameter->name; // @phpstan-ignore return.type (cant be empty string)
 	}
 
-	/** @return array{ type: Type, isNullable: bool } */
-	private static function extractTypeInfo(ReflectionParameter $parameter): array {
+	private static function extractTypeInfo(ReflectionParameter $parameter): Type {
 		$typeAttrs = $parameter->getAttributes(Type::class, ReflectionAttribute::IS_INSTANCEOF);
 		if (\count($typeAttrs) > 1) {
 			throw DefinitionException::forTooManyTypes($parameter->name);
 		}
 
 		foreach ($typeAttrs as $attr) {
-			return [
-				'type' => $attr->newInstance(),
-				'isNullable' => $parameter->getType()?->allowsNull() ?? false
-			];
+			return $attr->newInstance();
 		}
 
 		$type = $parameter->getType();
@@ -93,14 +97,8 @@ final readonly class Field {
 				: DefinitionException::forUnsupportedFieldType($parameter->name, $type);
 		}
 
-		return [
-			'type' => self::getSchemaTypeForDeclaredType($type->getName())
-				?? throw DefinitionException::forUnsupportedFieldType($parameter->name, $type->getName()),
-			'isNullable' => $type->allowsNull()
-				// parameters that default to null without a nullable type are deprecated since PHP 8.5
-				// so this case can be removed when PHP removes support for implied nullable parameters
-				|| $parameter->isOptional() && $parameter->getDefaultValue() === null
-		];
+		return self::getSchemaTypeForDeclaredType($type->getName())
+			?? throw DefinitionException::forUnsupportedFieldType($parameter->name, $type->getName());
 	}
 
 	private static function getSchemaTypeForDeclaredType(string $type): ?Type {
@@ -109,6 +107,8 @@ final readonly class Field {
 			DateTime::class => Types\DateTimeMutable::instance(),
 			DateTimeImmutable::class => Types\DateTime::instance(),
 			DateTimeInterface::class => Types\DateTime::instance(),
+			SequentialValue::class => Types\SequentialValue::instance(),
+			UniqueIdentifier::class => Types\UniqueIdentifier::instance(),
 			'array' => new Types\Map,
 			'string' => Types\String_::instance(),
 			'float' => Types\Float_::instance(),

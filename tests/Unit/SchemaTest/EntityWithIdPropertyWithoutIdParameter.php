@@ -11,13 +11,11 @@ use Slendium\Ocd\Entity;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class EmptyEntity implements Entity {
+final class EntityWithIdPropertyWithoutIdParameter implements Entity {
 
-	public function __construct(
+	#[Override]
+	public string $id = '';
 
-		#[Override]
-		public string $id,
-
-	) { }
+	public function __construct() { }
 
 }

@@ -18,7 +18,7 @@ final readonly class IntersectionUnionTypedFieldEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public readonly Entity\Id $id,
+		public string $id,
 
 		/** @var (ArrayAccess<string,mixed>&Countable)|int */
 		public (ArrayAccess&Countable)|int $intersectionUnion,

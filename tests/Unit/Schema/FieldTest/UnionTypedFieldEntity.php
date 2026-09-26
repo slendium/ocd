@@ -16,7 +16,7 @@ final readonly class UnionTypedFieldEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public readonly Entity\Id $id,
+		public string $id,
 
 		public float|int $union,
 

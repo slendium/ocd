@@ -4,6 +4,7 @@ namespace Slendium\OcdTests\Unit\SchemaTest;
 
 use Override;
 
+use Slendium\Ocd\Common\UniqueIdentifier;
 use Slendium\Ocd\Entity;
 
 /**
@@ -11,20 +12,12 @@ use Slendium\Ocd\Entity;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class EntityWithScalarFields implements Entity {
+final readonly class EntityWithUniqueId implements Entity {
 
 	public function __construct(
 
 		#[Override]
-		public string $id,
-
-		public string $string,
-
-		public float $float,
-
-		public int $int,
-
-		public bool $bool,
+		public UniqueIdentifier $id,
 
 	) { }
 

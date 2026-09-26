@@ -2,14 +2,14 @@
 
 namespace Slendium\Ocd;
 
+use Slendium\Ocd\Common\SequentialValue;
+use Slendium\Ocd\Common\UniqueIdentifier;
+
 /**
  * A database-serializable object that is uniquely identifiable.
  *
  * Objects are not required to implement this interface to generate a {@see Schema}.
  * In this case the schema won't contain an automatically generated primary key.
- *
- * Further configuration of the ID field requires adding the {@see Schema\IdOptions} attribute to the
- * `$id` property.
  *
  * Fields are declared as parameters of the constructor of the entity.
  * These parameters are later used to reconstruct an entity from a database record.
@@ -28,7 +28,7 @@ namespace Slendium\Ocd;
  * 	public function __construct(
  *
  * 		#[Override]
- * 		public readonly Entity\Id $id,
+ * 		public readonly UniqueIdentifier $id,
  *
  * 		#[Schema\FieldName('NAME_LEGACY')]
  * 		public readonly string $name,
@@ -50,6 +50,6 @@ namespace Slendium\Ocd;
 interface Entity {
 
 	/** @since 1.0 */
-	public Entity\Id $id { get; }
+	public UniqueIdentifier|SequentialValue|string|int $id { get; }
 
 }

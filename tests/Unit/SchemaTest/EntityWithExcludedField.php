@@ -17,7 +17,7 @@ final readonly class EntityWithExcludedField implements Entity {
 	public function __construct(
 
 		#[Override]
-		public Entity\Id $id,
+		public string $id,
 
 		public string $included,
 

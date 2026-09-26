@@ -17,7 +17,7 @@ final readonly class EntityWithBlobField implements Entity {
 	public function __construct(
 
 		#[Override]
-		public Entity\Id $id,
+		public string $id,
 
 		public Blob $blob,
 

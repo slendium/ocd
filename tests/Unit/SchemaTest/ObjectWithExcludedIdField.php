@@ -2,9 +2,6 @@
 
 namespace Slendium\OcdTests\Unit\SchemaTest;
 
-use Override;
-
-use Slendium\Ocd\Entity;
 use Slendium\Ocd\Schema;
 
 /**
@@ -12,11 +9,11 @@ use Slendium\Ocd\Schema;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class EntityThatExcludesId implements Entity {
+final class ObjectWithExcludedIdField {
 
 	public function __construct(
 
-		#[Override, Schema\Exclude]
+		#[Schema\Exclude]
 		public string $id,
 
 	) { }

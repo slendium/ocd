@@ -16,7 +16,7 @@ final readonly class UnitEnumFieldEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public Entity\Id $id,
+		public string $id,
 
 		public FakeUnitEnum $enumeration,
 

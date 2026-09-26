@@ -4,8 +4,6 @@ namespace Slendium\Ocd\Schema;
 
 use Exception;
 
-use Slendium\Ocd\Entity\Id;
-
 /**
  * Thrown when an illogical schema definition is detected.
  *
@@ -32,12 +30,7 @@ class DefinitionException extends Exception {
 
 	/** @internal */
 	public static function forMissingIdField(): self {
-		return new self('Expected a field named `id` of type `'.Id::class.'` for identifiable entity');
-	}
-
-	/** @internal */
-	public static function forUnimplementedIdGenerator(): self {
-		return new self('Expected an implementation for the custom ID generator');
+		return new self('Expected a field named `id` for entity');
 	}
 
 }

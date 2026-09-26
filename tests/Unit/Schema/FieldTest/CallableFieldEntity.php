@@ -18,7 +18,7 @@ final readonly class CallableFieldEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public readonly Entity\Id $id,
+		public string $id,
 
 		callable $callable,
 

@@ -18,7 +18,7 @@ final readonly class NullableFieldWithDefaultEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public readonly Entity\Id $id,
+		public string $id,
 
 		public ?int $defaultInt = self::DEFAULT_VALUE,
 

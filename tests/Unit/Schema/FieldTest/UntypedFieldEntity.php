@@ -18,7 +18,7 @@ final readonly class UntypedFieldEntity implements Entity {
 	public function __construct( // @phpstan-ignore missingType.parameter (deliberate for test purposes)
 
 		#[Override]
-		public readonly Entity\Id $id,
+		public string $id,
 
 		$untyped,
 

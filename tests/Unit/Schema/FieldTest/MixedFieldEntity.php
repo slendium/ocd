@@ -16,7 +16,7 @@ final readonly class MixedFieldEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public readonly Entity\Id $id,
+		public string $id,
 
 		public mixed $mixed,
 

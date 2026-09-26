@@ -21,7 +21,7 @@ final readonly class RenamedFieldEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public readonly Entity\Id $id,
+		public string $id,
 
 		#[Schema\FieldName(self::RENAMED_NAME)]
 		public string $originalName,

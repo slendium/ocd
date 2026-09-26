@@ -7,6 +7,8 @@ use OutOfBoundsException;
 
 use PHPUnit\Framework\TestCase;
 
+use Slendium\Ocd\Common\SequentialValue;
+use Slendium\Ocd\Common\UniqueIdentifier;
 use Slendium\Ocd\Schema;
 
 /**
@@ -16,24 +18,23 @@ use Slendium\Ocd\Schema;
  */
 final class SchemaTest extends TestCase {
 
-	private const DEFAULT_ID_GENERATOR = Schema\IdGenerator::UniqueIdentifier;
-
-	public function test_fromConstructorParameters_shouldSetDefaultIdGenerator(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EmptyEntity::class);
-
-		$resultIdOptions = $sut->idOptions;
-		$resultFields = $sut->fields;
-
-		$this->assertSame(self::DEFAULT_ID_GENERATOR, $resultIdOptions?->generator);
-		$this->assertFalse(isset($resultFields['id']));
-	}
-
-	public function test_fromConstructorParameters_shouldIgnoreExcludeAttributeAndSetDefaultGenerator_whenExcludeAttributeIsAppliedToId(): void {
+	public function test_fromConstructorParameters_shouldThrow_whenEntityExcludesIdField(): void {
+		// Arrange
 		$sut = Schema::fromConstructorParameters(SchemaTest\EntityThatExcludesId::class);
 
-		$result = $sut->idOptions?->generator;
+		// Assert
+		$this->expectException(Schema\DefinitionException::class);
 
-		$this->assertSame(self::DEFAULT_ID_GENERATOR, $result);
+		// Act
+		$_ = $sut->fields;
+	}
+
+	public function test_fromConstructorParameters_shouldIgnoreIdField_whenIdFieldOfRegularObjectIsExcluded(): void {
+		$sut = Schema::fromConstructorParameters(SchemaTest\ObjectWithExcludedIdField::class);
+
+		$result = \count($sut->fields);
+
+		$this->assertSame(0, $result);
 	}
 
 	public function test_fromConstructorParameters_shouldIncludeScalarFields_whenDeclaredInTheConstructor(): void {
@@ -41,8 +42,8 @@ final class SchemaTest extends TestCase {
 
 		$result = $sut->fields;
 
-		$this->assertSame(self::DEFAULT_ID_GENERATOR, $sut->idOptions?->generator);
-		$this->assertSame(4, \count($result));
+		$this->assertSame(5, \count($result));
+		$this->assertTrue(isset($result['id']));
 		$this->assertTrue(isset($result['string']));
 		$this->assertTrue(isset($result['float']));
 		$this->assertTrue(isset($result['int']));
@@ -54,7 +55,8 @@ final class SchemaTest extends TestCase {
 
 		$result = $sut->fields;
 
-		$this->assertSame(1, \count($result));
+		$this->assertSame(2, \count($result));
+		$this->assertTrue(isset($result['id']));
 		$this->assertTrue(isset($result['blob']));
 	}
 
@@ -63,7 +65,8 @@ final class SchemaTest extends TestCase {
 
 		$result = $sut->fields;
 
-		$this->assertSame(1, \count($result));
+		$this->assertSame(2, \count($result));
+		$this->assertTrue(isset($result['id']));
 		$this->assertTrue(isset($result['included']));
 		$this->assertFalse(isset($result['excluded']));
 	}
@@ -80,12 +83,24 @@ final class SchemaTest extends TestCase {
 		$this->assertTrue(isset($result['flag']));
 	}
 
+	public function test_fromConstructorParameters_shouldThrow_whenEntityDoesNotDefineIdAsField(): void {
+		// Arrange
+		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithIdPropertyWithoutIdParameter::class);
+
+		// Assert
+		$this->expectException(Schema\DefinitionException::class);
+
+		// Act
+		$_ = $sut->fields;
+	}
+
 	public function test_fields_shouldRenameFields_whenDeclaredWithFieldNameAttribute(): void {
 		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithRenamedField::class);
 
 		$result = $sut->fields;
 
-		$this->assertSame(1, \count($result));
+		$this->assertSame(2, \count($result));
+		$this->assertTrue(isset($result['id']));
 		$this->assertTrue(isset($result['alternativeName']));
 	}
 
@@ -122,7 +137,7 @@ final class SchemaTest extends TestCase {
 			$count += 1;
 		}
 
-		$this->assertSame(4, $count);
+		$this->assertSame(5, $count);
 	}
 
 	public function test_fields_getIterator_shouldUseRealFieldNameAsKey_whenFieldWasRenamed(): void {
@@ -136,12 +151,12 @@ final class SchemaTest extends TestCase {
 		}
 	}
 
-	public function test_idOptions_shouldBeNull_whenNonEntity(): void {
+	public function test_fields_shouldNotContainId_whenNonEntity(): void {
 		$sut = Schema::fromConstructorParameters(SchemaTest\EmptyObject::class);
 
-		$result = $sut->idOptions;
+		$result = $sut->fields;
 
-		$this->assertNull($result);
+		$this->assertFalse(isset($result['id']));
 	}
 
 	public function test_fields_shouldContainIdField_whenGenericObjectDeclaresIdField(): void {
@@ -171,12 +186,20 @@ final class SchemaTest extends TestCase {
 		$this->assertInstanceOf(Schema\Field::class, $result);
 	}
 
-	public function test_idOptions_generator_shouldHaveNonDefaultGenerator_whenEntityDeclaresIdOptions(): void {
+	public function test_fields_shouldHaveIdWithSequentialValueType_whenEntityDeclaresOne(): void {
 		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithSequentialId::class);
 
-		$result = $sut->idOptions?->generator;
+		$result = Schema\TypeInfo::getSerializeType($sut->fields['id']->type::class); // @phpstan-ignore property.nonObject (the field will be found)
 
-		$this->assertSame(Schema\IdGenerator::Sequence, $result);
+		$this->assertSame(SequentialValue::class, $result);
+	}
+
+	public function test_fields_shouldHaveIdWithUniqueIdentifierType_whenEntityDeclaresOne(): void {
+		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithUniqueId::class);
+
+		$result = Schema\TypeInfo::getSerializeType($sut->fields['id']->type::class); // @phpstan-ignore property.nonObject (the field will be found)
+
+		$this->assertSame(UniqueIdentifier::class, $result);
 	}
 
 }

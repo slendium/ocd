@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 use Slendium\Ocd\Entity;
 use Slendium\Ocd\Schema;
-use Slendium\Ocd\Schema\Type\CharacterLimited;
 
 /**
  * @internal
@@ -16,7 +15,7 @@ use Slendium\Ocd\Schema\Type\CharacterLimited;
  */
 final class FieldTest extends TestCase {
 
-	public function test_fromParameter_shouldNotThrowForAnyBuiltinType(): void {
+	public function test_shouldNotThrowForAnyBuiltinType(): void {
 		// Assert
 		$this->expectNotToPerformAssertions();
 
@@ -26,7 +25,7 @@ final class FieldTest extends TestCase {
 		}
 	}
 
-	public function test_fromParameter_shouldNotThrowForAnyOverrideType(): void {
+	public function test_shouldNotThrowForAnyOverrideType(): void {
 		// Assert
 		$this->expectNotToPerformAssertions();
 
@@ -60,7 +59,7 @@ final class FieldTest extends TestCase {
 		$this->expectException(Schema\DefinitionException::class);
 
 		// Act
-		$_ = $sut->fields[$fieldName];
+		$_ = $sut->fields[$fieldName]->type; // @phpstan-ignore property.nonObject (the field will be found)
 	}
 
 	public function test_isNullable_shouldBeFalse_whenTypeIsNotNullableAndHasNonNullDefault(): void {

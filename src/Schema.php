@@ -24,71 +24,34 @@ use ReflectionParameter;
 final readonly class Schema {
 
 	/**
-	 * The entity's regular fields.
-	 *
-	 * Does not contain managed fields, such as the `id` of {@see Entity\Identifiable} entities.
-	 *
-	 * @since 1.0
-	 * @var ArrayAccess<non-empty-string,Schema\Field>&Countable&Traversable<Schema\Field>
-	 */
-	public ArrayAccess&Countable&Traversable $fields;
-
-	/**
 	 * Creates a schema from the constructor parameters of a given class.
 	 *
-	 * If the given class implements {@see Entity\Identifiable} it must declare an `$id` parameter in the constructor.
-	 * This parameter must declare a type that implements {@see Entity\Id}.
-	 * This `$id` is not a regular field and therefor won't end up in the `$fields` property.
+	 * If the given class implements {@see Entity} it must declare an `$id` parameter.
 	 *
 	 * @since 1.0
 	 * @param class-string $class
 	 */
 	public static function fromConstructorParameters(string $class): self {
-		return new ReflectionClass(self::class)->newLazyGhost(static function (self $object) use ($class) {
-			$isIdentifiable = \is_a($class, Entity::class, allow_string: true);
+		return new ReflectionClass(self::class)->newLazyGhost(static function(self $object) use ($class) {
+			$parameters = new ReflectionClass($class)->getConstructor()?->getParameters() ?? [ ];
+			$fields = Schema\Fields::fromParameters($parameters);
 
-			$idOptions = null;
-			$fields = [ ];
-			foreach (new ReflectionClass($class)->getConstructor()?->getParameters() ?? [ ] as $parameter) {
-				if ($isIdentifiable && $parameter->name === 'id') {
-					$idOptions = self::extractIdOptions($parameter);
-				} else if (self::isParameterEligible($parameter)) {
-					$fields[] = Schema\Field::fromParameter($parameter);
-				}
-			}
-
-			if ($isIdentifiable && $idOptions === null) {
+			if (\is_a($class, Entity::class, allow_string: true) && !isset($fields['id'])) {
 				throw Schema\DefinitionException::forMissingIdField();
 			}
 
-			$object->__construct($idOptions, $fields);
+			$object->__construct($fields);
 		});
 	}
 
-	private static function extractIdOptions(ReflectionParameter $idParameter): Schema\IdOptions {
-		foreach ($idParameter->getAttributes(Schema\IdOptions::class) as $attr) {
-			return $attr->newInstance();
-		}
-		return new Schema\IdOptions(Schema\IdGenerator::UniqueIdentifier);
-	}
-
-	private static function isParameterEligible(ReflectionParameter $parameter): bool {
-		foreach ($parameter->getAttributes(Schema\Exclude::class) as $attr) {
-			return false;
-		}
-		return true;
-	}
-
-	/** @param iterable<Schema\Field> $fields */
 	private function __construct(
 
-		/** @since 1.0 */
-		public ?Schema\IdOptions $idOptions,
+		/**
+		 * @since 1.0
+		 * @var ArrayAccess<non-empty-string,Schema\Field>&Countable&Traversable<Schema\Field>
+		 */
+		public ArrayAccess&Countable&Traversable $fields,
 
-		iterable $fields,
-
-	) {
-		$this->fields = new Schema\Fields($fields);
-	}
+	) { }
 
 }

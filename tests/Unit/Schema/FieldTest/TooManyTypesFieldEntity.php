@@ -17,7 +17,7 @@ class TooManyTypesFieldEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public Entity\Id $id,
+		public string $id,
 
 		#[SchemaTypes\String_, SchemaTypes\Int_]
 		public string $tooMany,

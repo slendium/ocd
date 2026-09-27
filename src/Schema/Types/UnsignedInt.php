@@ -4,19 +4,16 @@ namespace Slendium\Ocd\Schema\Types;
 
 use Attribute;
 
+use Slendium\Ocd\Schema\Type;
+
 /**
  * @since 1.0
  * @author C. Fahner
  * @copyright Slendium 2026
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class Int_ extends BaseInt {
+final class UnsignedInt extends BaseInt implements Type\Unsigned {
 
-	private static self $instance;
-
-	/** @internal */
-	public static function instance(): self {
-		return self::$instance ??= new self;
-	}
+	// TODO reject negative values
 
 }

@@ -7,6 +7,10 @@ use Slendium\Ocd\Schema;
 /**
  * Offers support for enforcing a {@see Schema} on database collections.
  *
+ * Try to avoid special characters in collection or field names.
+ * Database implementations are allowed to reject schemas that contain names with characters that
+ * would require escaping.
+ *
  * @since 1.0
  * @author C. Fahner
  * @copyright Slendium 2026

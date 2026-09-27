@@ -8,6 +8,7 @@ use Attribute;
  * Contains the preferred name of field.
  *
  * For maximum compatibility: keep field names simple and avoid special characters, especially `.` and `$`.
+ * Database implementations are allowed to reject names with special characters.
  *
  * @since 1.0
  * @author C. Fahner

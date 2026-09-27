@@ -301,28 +301,6 @@ final class DocumentShapeTest extends TestCase {
 		$this->assertSame($expectedResult, $result->rhs);
 	}
 
-	public function test_isOfType_shouldProduceValidPredicate(): void {
-		$expectedStorageClass = StorageClass::String;
-		$field = 'test';
-		$sut = Q::isOfType($expectedStorageClass);
-
-		$result = $sut(new FieldPath([ $field ]));
-
-		$this->assertSame([ $field ], $result->field->path);
-		$this->assertSame($expectedStorageClass, $result->storageClass);
-	}
-
-	public function test_isNotOfType_shouldProduceValidPredicate(): void {
-		$expectedStorageClass = StorageClass::String;
-		$field = 'test';
-		$sut = Q::isNotOfType($expectedStorageClass);
-
-		$result = $sut(new FieldPath([ $field ]));
-
-		$this->assertSame([ $field ], $result->field->path);
-		$this->assertSame($expectedStorageClass, $result->storageClass);
-	}
-
 	public function test_path_shouldProduceMergedPath(): void {
 		$topLevelPart = 'test';
 		$topLevelField = new FieldPath([ $topLevelPart ]);

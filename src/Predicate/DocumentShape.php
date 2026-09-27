@@ -231,22 +231,6 @@ final class DocumentShape {
 
 	/**
 	 * @since 1.0
-	 * @return Closure(FieldPath):Expr\IsOfType
-	 */
-	public static function isOfType(StorageClass $type): Closure {
-		return static fn(FieldPath $field) => new Expr\IsOfType($field, $type);
-	}
-
-	/**
-	 * @since 1.0
-	 * @return Closure(FieldPath):Expr\NotOfType
-	 */
-	public static function isNotOfType(StorageClass $type): Closure {
-		return static fn(FieldPath $field) => new Expr\NotOfType($field, $type);
-	}
-
-	/**
-	 * @since 1.0
 	 * @param non-empty-list<non-empty-string> $path
 	 * @param Closure(FieldPath):Predicate $wrappee
 	 * @return Closure(FieldPath):Predicate

@@ -42,18 +42,6 @@ interface Visitor {
 	 * @since 1.0
 	 * @return R
 	 */
-	public function visitIsOfType(Expr\IsOfType $expr): mixed;
-
-	/**
-	 * @since 1.0
-	 * @return R
-	 */
-	public function visitNotOfType(Expr\NotOfType $expr): mixed;
-
-	/**
-	 * @since 1.0
-	 * @return R
-	 */
 	public function visitEqual(Expr\Equal $expr): mixed;
 
 	/**

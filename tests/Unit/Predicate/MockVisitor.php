@@ -47,16 +47,6 @@ final class MockVisitor implements Visitor {
 	}
 
 	#[Override]
-	public function visitIsOfType(Expr\IsOfType $expr): mixed {
-		return $this->callHook(__FUNCTION__, $expr);
-	}
-
-	#[Override]
-	public function visitNotOfType(Expr\NotOfType $expr): mixed {
-		return $this->callHook(__FUNCTION__, $expr);
-	}
-
-	#[Override]
 	public function visitEqual(Expr\Equal $expr): mixed {
 		return $this->callHook(__FUNCTION__, $expr);
 	}

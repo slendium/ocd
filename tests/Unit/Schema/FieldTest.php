@@ -20,7 +20,7 @@ final class FieldTest extends TestCase {
 		$this->expectNotToPerformAssertions();
 
 		// Act
-		foreach (Schema::fromConstructorParameters(FieldTest\BuiltinTypesEntity::class)->fields as $field) {
+		foreach (Schema::fromClass(FieldTest\BuiltinTypesEntity::class)->fields as $field) {
 			$_ = $field->type;
 		}
 	}
@@ -30,7 +30,7 @@ final class FieldTest extends TestCase {
 		$this->expectNotToPerformAssertions();
 
 		// Act
-		foreach (Schema::fromConstructorParameters(FieldTest\BuiltinTypesAsAttributesEntity::class)->fields as $field) {
+		foreach (Schema::fromClass(FieldTest\BuiltinTypesAsAttributesEntity::class)->fields as $field) {
 			$_ = $field->type;
 		}
 	}
@@ -44,6 +44,7 @@ final class FieldTest extends TestCase {
 		yield 'intersection+union' => [ FieldTest\IntersectionUnionTypedFieldEntity::class, 'intersectionUnion' ];
 		yield 'unit-enum' => [ FieldTest\UnitEnumFieldEntity::class, 'enumeration' ];
 		yield 'too-many-types' => [ FieldTest\TooManyTypesFieldEntity::class, 'tooMany' ];
+		yield 'variadic' => [ FieldTest\VariadicFieldEntity::class, 'variadic' ];
 	}
 
 	/**
@@ -53,7 +54,7 @@ final class FieldTest extends TestCase {
 	#[DataProvider('definitionExceptionCases')]
 	public function test_shouldThrow_whenProvidedWithUnsupportedEntityDefinition(string $entityClass, string $fieldName): void {
 		// Arrange
-		$sut = Schema::fromConstructorParameters($entityClass);
+		$sut = Schema::fromClass($entityClass);
 
 		// Assert
 		$this->expectException(Schema\DefinitionException::class);
@@ -63,7 +64,7 @@ final class FieldTest extends TestCase {
 	}
 
 	public function test_isNullable_shouldBeFalse_whenTypeIsNotNullableAndHasNonNullDefault(): void {
-		$sut = Schema::fromConstructorParameters(FieldTest\NonNullableFieldWithDefaultEntity::class)->fields['defaultString'];
+		$sut = Schema::fromClass(FieldTest\NonNullableFieldWithDefaultEntity::class)->fields['defaultString'];
 
 		$resultNullable = $sut->isNullable; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 		$resultDefaultValue = $sut->defaultValue; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
@@ -73,7 +74,7 @@ final class FieldTest extends TestCase {
 	}
 
 	public function test_isNullable_shouldBeTrue_whenTypeIsNullableButParameterIsRequired(): void {
-		$sut = Schema::fromConstructorParameters(FieldTest\NullableFieldEntity::class)->fields['nullableString'];
+		$sut = Schema::fromClass(FieldTest\NullableFieldEntity::class)->fields['nullableString'];
 
 		$resultNullable = $sut->isNullable; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 		$resultDefaultValue = $sut->defaultValue; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
@@ -83,7 +84,7 @@ final class FieldTest extends TestCase {
 	}
 
 	public function test_defaultValue_shouldTakeDeclaredValue_whenTypeIsNullable(): void {
-		$sut = Schema::fromConstructorParameters(FieldTest\NullableFieldWithDefaultEntity::class)->fields['defaultInt'];
+		$sut = Schema::fromClass(FieldTest\NullableFieldWithDefaultEntity::class)->fields['defaultInt'];
 
 		$resultNullable = $sut->isNullable; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 		$resultDefaultValue = $sut->defaultValue; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
@@ -95,7 +96,7 @@ final class FieldTest extends TestCase {
 	public function test_originalName_shouldContainExpectedValue_whenFieldIsRenamed(): void {
 		$name = FieldTest\RenamedFieldEntity::RENAMED_NAME;
 		$expectedResult = FieldTest\RenamedFieldEntity::ORIGINAL_NAME;
-		$sut = Schema::fromConstructorParameters(FieldTest\RenamedFieldEntity::class)->fields[$name];
+		$sut = Schema::fromClass(FieldTest\RenamedFieldEntity::class)->fields[$name];
 
 		$result = $sut->originalName; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 
@@ -104,7 +105,7 @@ final class FieldTest extends TestCase {
 
 	public function test_originalName_shouldMatchCurrentName_whenFieldIsNotRenamed(): void {
 		$name = FieldTest\NonRenamedFieldEntity::FIELD_NAME;
-		$sut = Schema::fromConstructorParameters(FieldTest\NonRenamedFieldEntity::class)->fields[$name];
+		$sut = Schema::fromClass(FieldTest\NonRenamedFieldEntity::class)->fields[$name];
 
 		$resultName = $sut->name; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)
 		$resultOriginalName = $sut->originalName; // @phpstan-ignore property.nonObject (bug? offset either throws or returns a Field)

@@ -33,4 +33,9 @@ class DefinitionException extends Exception {
 		return new self('Expected a field named `id` for entity');
 	}
 
+	/** @internal */
+	public static function forVariadicParameter(string $name): self {
+		return new self("Unexpected variadic parameter for definition of field `$name`");
+	}
+
 }

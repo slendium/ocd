@@ -24,16 +24,22 @@ use ReflectionParameter;
 final readonly class Schema {
 
 	/**
-	 * Creates a schema from the constructor parameters of a given class.
+	 * Creates a schema for the given class.
+	 *
+	 * By default the schema is created from the constructor parameters.
+	 * Classes can implement {@see Entity\FromFields} to override the default behavior and extract
+	 * the schema from the parameters of the static `::fromFields()` method instead.
 	 *
 	 * If the given class implements {@see Entity} it must declare an `$id` parameter.
 	 *
 	 * @since 1.0
 	 * @param class-string $class
 	 */
-	public static function fromConstructorParameters(string $class): self {
+	public static function fromClass(string $class): self {
 		return new ReflectionClass(self::class)->newLazyGhost(static function(self $object) use ($class) {
-			$parameters = new ReflectionClass($class)->getConstructor()?->getParameters() ?? [ ];
+			$parameters = \is_a($class, Entity\FromFields::class, allow_string: true)
+				? new ReflectionClass($class)->getMethod('fromFields')->getParameters()
+				: new ReflectionClass($class)->getConstructor()?->getParameters() ?? [ ];
 			$fields = Schema\Fields::fromParameters($parameters);
 
 			if (\is_a($class, Entity::class, allow_string: true) && !isset($fields['id'])) {

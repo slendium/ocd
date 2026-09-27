@@ -18,9 +18,9 @@ use Slendium\Ocd\Schema;
  */
 final class SchemaTest extends TestCase {
 
-	public function test_fromConstructorParameters_shouldThrow_whenEntityExcludesIdField(): void {
+	public function test_fromClass_shouldThrow_whenEntityExcludesIdField(): void {
 		// Arrange
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityThatExcludesId::class);
+		$sut = Schema::fromClass(SchemaTest\EntityThatExcludesId::class);
 
 		// Assert
 		$this->expectException(Schema\DefinitionException::class);
@@ -29,16 +29,16 @@ final class SchemaTest extends TestCase {
 		$_ = $sut->fields;
 	}
 
-	public function test_fromConstructorParameters_shouldIgnoreIdField_whenIdFieldOfRegularObjectIsExcluded(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\ObjectWithExcludedIdField::class);
+	public function test_fromClass_shouldIgnoreIdField_whenIdFieldOfRegularObjectIsExcluded(): void {
+		$sut = Schema::fromClass(SchemaTest\ObjectWithExcludedIdField::class);
 
 		$result = \count($sut->fields);
 
 		$this->assertSame(0, $result);
 	}
 
-	public function test_fromConstructorParameters_shouldIncludeScalarFields_whenDeclaredInTheConstructor(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithScalarFields::class);
+	public function test_fromClass_shouldIncludeScalarFields_whenDeclaredInTheConstructor(): void {
+		$sut = Schema::fromClass(SchemaTest\EntityWithScalarFields::class);
 
 		$result = $sut->fields;
 
@@ -50,8 +50,8 @@ final class SchemaTest extends TestCase {
 		$this->assertTrue(isset($result['bool']));
 	}
 
-	public function test_fromConstructorParameters_shouldIncludeBlobField_whenDeclaredInConstructor(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithBlobField::class);
+	public function test_fromClass_shouldIncludeBlobField_whenDeclaredInConstructor(): void {
+		$sut = Schema::fromClass(SchemaTest\EntityWithBlobField::class);
 
 		$result = $sut->fields;
 
@@ -60,8 +60,8 @@ final class SchemaTest extends TestCase {
 		$this->assertTrue(isset($result['blob']));
 	}
 
-	public function test_fromConstructorParameters_shouldNotContainExcludedFields(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithExcludedField::class);
+	public function test_fromClass_shouldNotContainExcludedFields(): void {
+		$sut = Schema::fromClass(SchemaTest\EntityWithExcludedField::class);
 
 		$result = $sut->fields;
 
@@ -71,8 +71,8 @@ final class SchemaTest extends TestCase {
 		$this->assertFalse(isset($result['excluded']));
 	}
 
-	public function test_fromConstructorParameters_shouldFindAllFields_whenCalledWithNonEntity(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\NonEntity::class);
+	public function test_fromClass_shouldFindAllFields_whenCalledWithNonEntity(): void {
+		$sut = Schema::fromClass(SchemaTest\NonEntity::class);
 
 		$result = $sut->fields;
 
@@ -83,9 +83,9 @@ final class SchemaTest extends TestCase {
 		$this->assertTrue(isset($result['flag']));
 	}
 
-	public function test_fromConstructorParameters_shouldThrow_whenEntityDoesNotDefineIdAsField(): void {
+	public function test_fromClass_shouldThrow_whenEntityDoesNotDefineIdAsField(): void {
 		// Arrange
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithIdPropertyWithoutIdParameter::class);
+		$sut = Schema::fromClass(SchemaTest\EntityWithIdPropertyWithoutIdParameter::class);
 
 		// Assert
 		$this->expectException(Schema\DefinitionException::class);
@@ -94,8 +94,19 @@ final class SchemaTest extends TestCase {
 		$_ = $sut->fields;
 	}
 
+	public function test_fromClass_shouldPreferStaticConstructorMethodOverRegularConstructor(): void {
+		$sut = Schema::fromClass(SchemaTest\EntityWithStaticConstructor::class);
+
+		$result = $sut->fields;
+
+		$this->assertSame(2, \count($result));
+		$this->assertTrue(isset($result['id']));
+		$this->assertTrue(isset($result['overrideName']));
+		$this->assertFalse(isset($result['originalName']));
+	}
+
 	public function test_fields_shouldRenameFields_whenDeclaredWithFieldNameAttribute(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithRenamedField::class);
+		$sut = Schema::fromClass(SchemaTest\EntityWithRenamedField::class);
 
 		$result = $sut->fields;
 
@@ -106,7 +117,7 @@ final class SchemaTest extends TestCase {
 
 	public function test_fields_shouldThrow_whenSettingOffset(): void {
 		// Arrange
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithScalarFields::class)->fields;
+		$sut = Schema::fromClass(SchemaTest\EntityWithScalarFields::class)->fields;
 
 		// Assert
 		$this->expectException(Exception::class);
@@ -117,7 +128,7 @@ final class SchemaTest extends TestCase {
 
 	public function test_fields_shouldThrow_whenUnsettingOffset(): void {
 		// Arrange
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithScalarFields::class)->fields;
+		$sut = Schema::fromClass(SchemaTest\EntityWithScalarFields::class)->fields;
 
 		// Assert
 		$this->expectException(Exception::class);
@@ -127,7 +138,7 @@ final class SchemaTest extends TestCase {
 	}
 
 	public function test_fields_getIterator_shouldNotThrow(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithScalarFields::class)->fields;
+		$sut = Schema::fromClass(SchemaTest\EntityWithScalarFields::class)->fields;
 
 		$count = 0;
 		foreach ($sut as $name => $field) {
@@ -142,7 +153,7 @@ final class SchemaTest extends TestCase {
 
 	public function test_fields_getIterator_shouldUseRealFieldNameAsKey_whenFieldWasRenamed(): void {
 		// Arrange
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithRenamedField::class)->fields;
+		$sut = Schema::fromClass(SchemaTest\EntityWithRenamedField::class)->fields;
 
 		// Act
 		foreach ($sut as $name => $field) {
@@ -152,7 +163,7 @@ final class SchemaTest extends TestCase {
 	}
 
 	public function test_fields_shouldNotContainId_whenNonEntity(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EmptyObject::class);
+		$sut = Schema::fromClass(SchemaTest\EmptyObject::class);
 
 		$result = $sut->fields;
 
@@ -160,7 +171,7 @@ final class SchemaTest extends TestCase {
 	}
 
 	public function test_fields_shouldContainIdField_whenGenericObjectDeclaresIdField(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\ObjectWithIdField::class);
+		$sut = Schema::fromClass(SchemaTest\ObjectWithIdField::class);
 
 		$result = $sut->fields;
 
@@ -169,7 +180,7 @@ final class SchemaTest extends TestCase {
 
 	public function test_fields_shouldThrow_whenOffsetDoesNotExist(): void {
 		// Arrange
-		$sut = Schema::fromConstructorParameters(SchemaTest\EmptyEntity::class);
+		$sut = Schema::fromClass(SchemaTest\EmptyEntity::class);
 
 		// Assert
 		$this->expectException(OutOfBoundsException::class);
@@ -179,7 +190,7 @@ final class SchemaTest extends TestCase {
 	}
 
 	public function test_fields_shouldReturnField_whenOffsetExists(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithScalarFields::class);
+		$sut = Schema::fromClass(SchemaTest\EntityWithScalarFields::class);
 
 		$result = $sut->fields['string'];
 
@@ -187,7 +198,7 @@ final class SchemaTest extends TestCase {
 	}
 
 	public function test_fields_shouldHaveIdWithSequentialValueType_whenEntityDeclaresOne(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithSequentialId::class);
+		$sut = Schema::fromClass(SchemaTest\EntityWithSequentialId::class);
 
 		$result = Schema\TypeInfo::getSerializeType($sut->fields['id']->type::class); // @phpstan-ignore property.nonObject (the field will be found)
 
@@ -195,7 +206,7 @@ final class SchemaTest extends TestCase {
 	}
 
 	public function test_fields_shouldHaveIdWithUniqueIdentifierType_whenEntityDeclaresOne(): void {
-		$sut = Schema::fromConstructorParameters(SchemaTest\EntityWithUniqueId::class);
+		$sut = Schema::fromClass(SchemaTest\EntityWithUniqueId::class);
 
 		$result = Schema\TypeInfo::getSerializeType($sut->fields['id']->type::class); // @phpstan-ignore property.nonObject (the field will be found)
 

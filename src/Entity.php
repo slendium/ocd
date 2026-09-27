@@ -11,7 +11,8 @@ use Slendium\Ocd\Common\UniqueIdentifier;
  * Objects are not required to implement this interface to generate a {@see Schema}.
  * In this case the schema won't contain an automatically generated primary key.
  *
- * Fields are declared as parameters of the constructor of the entity.
+ * Fields are declared as parameters of the constructor of the entity (default) or as parameters of
+ * a static method called `::fromFields()` when it implements {@see Entity\FromFields}.
  * These parameters are later used to reconstruct an entity from a database record.
  * Parameters can be excluded using the {@see Schema\Exclude} attribute.
  * The {@see Schema\FieldName} attribute overrides the default field name (the parameter name).

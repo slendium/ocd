@@ -32,6 +32,10 @@ final readonly class Field {
 
 	/** @internal */
 	public static function fromParameter(ReflectionParameter $parameter): self {
+		if ($parameter->isVariadic()) {
+			throw DefinitionException::forVariadicParameter($parameter->name);
+		}
+
 		$classReflector = new ReflectionClass(self::class);
 		$field = $classReflector->newLazyGhost(static function(self $object) use ($parameter) {
 			$object->__construct(

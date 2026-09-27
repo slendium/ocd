@@ -6,7 +6,7 @@ Database- and framework agnostic database abstraction layer / ORM for PHP.
 * Supports custom / derived types as long as they go back to the same primitives
 * Entities are based on plain PHP classes, adding `#[Attribute]`'s only where more specificity is needed
 * Does not force the active record pattern, inheritance, or a rich domain model (nor exclude them)
-* Developed without LLM's
+* No LLM-generated code
 * No dependencies
 
 ## Installation
@@ -32,12 +32,12 @@ which contains implementation guides and PHPUnit tests.
 A basic entity only requires a plain PHP class declaration.
 
 ```php
-final readonly class Product implements Entity, Entity\Identifiable {
+final readonly class Product implements Entity {
 
 	public function __construct(
 
 		#[Override]
-		public Entity\Id $id,
+		public Entity\UniqueIdentifier $id,
 
 		public string $name,
 
@@ -123,7 +123,7 @@ $updates = U::create([
 ]);
 
 $collection->startUpdate($filter, $updates)
-	->execute();
+	|> UpdateCommand::execute(?);
 ```
 
 #### Deleting data
@@ -143,10 +143,9 @@ $collection->startDelete($filter)
 
 1. **[Done]** Describing the schema
 1. **[Done]** Data manipulation (create, update, delete)
-1. Data querying
-	1. **[Done]** Reading from a cursor
-	1. Entity reassembly
+1. **[Done]** Reading queried data from a cursor
 1. Relationships and indices
+1. Entity reassembly
 1. Geospatial data
 1. Data aggregation
 1. Transactions

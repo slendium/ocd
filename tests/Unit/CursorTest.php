@@ -5,7 +5,7 @@ namespace Slendium\OcdTests\Unit;
 use PHPUnit\Framework\TestCase;
 
 use Slendium\Ocd\Cursor;
-use Slendium\Ocd\Predicate\DocumentShape as Q;
+use Slendium\Ocd\Query\DocumentShape as Q;
 
 /**
  * @internal

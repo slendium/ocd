@@ -4,7 +4,7 @@ namespace Slendium\Ocd;
 
 use Slendium\Ocd\Cursor\Filterable;
 use Slendium\Ocd\Cursor\Scrollable;
-use Slendium\Ocd\Predicate;
+use Slendium\Ocd\Query\Predicate;
 
 /**
  * Contains methods for manipulating cursors.

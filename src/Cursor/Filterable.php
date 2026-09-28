@@ -2,7 +2,7 @@
 
 namespace Slendium\Ocd\Cursor;
 
-use Slendium\Ocd\Predicate;
+use Slendium\Ocd\Query\Predicate;
 
 /**
  * Allows adding a filter to a cursor-like object.

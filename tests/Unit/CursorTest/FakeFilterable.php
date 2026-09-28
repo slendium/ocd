@@ -5,7 +5,7 @@ namespace Slendium\OcdTests\Unit\CursorTest;
 use Override;
 
 use Slendium\Ocd\Cursor\Filterable;
-use Slendium\Ocd\Predicate;
+use Slendium\Ocd\Query\Predicate;
 
 /**
  * @internal

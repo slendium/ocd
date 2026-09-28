@@ -63,7 +63,7 @@ You can manually construct them, use a predefined builder utility or create your
 An example using the built-in "document shape" query builder:
 
 ```php
-use Slendium\Ocd\Predicate\DocumentShape as Q;
+use Slendium\Ocd\Query\DocumentShape as Q;
 
 $filter = Q::shape([
 	'year' => 2026, // match a literal int
@@ -110,8 +110,8 @@ builder utilities.
 An example:
 
 ```php
-use Slendium\Ocd\Predicate\DocumentShape as Q;
-use Slendium\Ocd\Update\DocumentUpdate as U;
+use Slendium\Ocd\Query\DocumentShape as Q;
+use Slendium\Ocd\Query\DocumentUpdate as U;
 
 $filter = Q::shape([ 'id' => $updateId ]);
 

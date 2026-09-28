@@ -1,0 +1,32 @@
+<?php
+
+namespace Slendium\Ocd\Query;
+
+/**
+ * An expression that resolves to `true` or `false` if evaluated against a document.
+ *
+ * For the common use-case of matching certain document shapes (to use as a `WHERE` clause), the
+ * {@see DocumentShape} class can be used to easily build such queries.
+ *
+ * Library users should never implement this interface, it is only public for type hinting and documentation purposes.
+ * The only allowed implementations exist in the `Slendium\Ocd\Query\Predicate` namespace.
+ * Implementors can use the {@see PredicateVisitor} interface to ensure they cover all current and future types.
+ *
+ * Predicates would be a perfect use case for [tagged unions](https://wiki.php.net/rfc/tagged_unions),
+ * but sadly this RFC is not moving at all.
+ *
+ * @since 1.0
+ * @author C. Fahner
+ * @copyright Slendium 2026
+ */
+interface Predicate {
+
+	/**
+	 * @since 1.0
+	 * @template R
+	 * @param PredicateVisitor<R> $visitor
+	 * @return R
+	 */
+	public function accept(PredicateVisitor $visitor): mixed;
+
+}

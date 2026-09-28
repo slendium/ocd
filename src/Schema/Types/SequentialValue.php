@@ -4,7 +4,7 @@ namespace Slendium\Ocd\Schema\Types;
 
 use Override;
 
-use Slendium\Ocd\Common\SequentialValue as SequentialValueValue;
+use Slendium\Ocd\Entity\SequentialValue as SequentialValueValue;
 use Slendium\Ocd\Schema\Type;
 
 /**

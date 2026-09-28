@@ -4,7 +4,7 @@ namespace Slendium\OcdTests\Unit\Common;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\SequentialValue;
+use Slendium\Ocd\Entity\SequentialValue;
 
 /**
  * @internal

@@ -4,7 +4,7 @@ namespace Slendium\OcdTests\Unit\Common;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\UniqueIdentifier;
+use Slendium\Ocd\Entity\UniqueIdentifier;
 
 /**
  * @internal

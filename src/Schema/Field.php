@@ -12,8 +12,8 @@ use ReflectionNamedType;
 use ReflectionParameter;
 
 use Slendium\Ocd\Common\Blob;
-use Slendium\Ocd\Common\SequentialValue;
-use Slendium\Ocd\Common\UniqueIdentifier;
+use Slendium\Ocd\Entity\SequentialValue;
+use Slendium\Ocd\Entity\UniqueIdentifier;
 
 /**
  * Defines a field within a schema.

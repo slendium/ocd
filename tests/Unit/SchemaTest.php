@@ -7,8 +7,8 @@ use OutOfBoundsException;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\SequentialValue;
-use Slendium\Ocd\Common\UniqueIdentifier;
+use Slendium\Ocd\Entity\SequentialValue;
+use Slendium\Ocd\Entity\UniqueIdentifier;
 use Slendium\Ocd\Schema;
 
 /**

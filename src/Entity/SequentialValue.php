@@ -1,6 +1,6 @@
 <?php
 
-namespace Slendium\Ocd\Common;
+namespace Slendium\Ocd\Entity;
 
 use JsonSerializable;
 use Override;

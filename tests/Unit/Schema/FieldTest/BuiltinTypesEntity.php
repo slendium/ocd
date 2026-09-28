@@ -8,7 +8,6 @@ use DateTimeInterface;
 use Override;
 
 use Slendium\Ocd\Common\Blob;
-use Slendium\Ocd\Common\UniqueIdentifier;
 use Slendium\Ocd\Entity;
 
 /**
@@ -21,7 +20,7 @@ final readonly class BuiltinTypesEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public UniqueIdentifier $id,
+		public Entity\UniqueIdentifier $id,
 
 		public DateTime $dateTime,
 

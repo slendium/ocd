@@ -4,7 +4,7 @@ namespace Slendium\Ocd\Schema\Types;
 
 use Override;
 
-use Slendium\Ocd\Common\UniqueIdentifier as UniqueIdentifierValue;
+use Slendium\Ocd\Entity\UniqueIdentifier as UniqueIdentifierValue;
 use Slendium\Ocd\Schema\Type;
 
 /**

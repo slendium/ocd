@@ -4,7 +4,6 @@ namespace Slendium\OcdTests\Unit\Schema\FieldTest;
 
 use Override;
 
-use Slendium\Ocd\Common\UniqueIdentifier;
 use Slendium\Ocd\Entity;
 use Slendium\Ocd\Schema\Types as SchemaTypes;
 
@@ -18,7 +17,7 @@ final readonly class BuiltinTypesAsAttributesEntity implements Entity {
 	public function __construct(
 
 		#[Override]
-		public UniqueIdentifier $id,
+		public Entity\UniqueIdentifier $id,
 
 		#[SchemaTypes\DateTime]
 		public mixed $dateTime,

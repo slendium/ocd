@@ -4,7 +4,6 @@ namespace Slendium\OcdTests\Unit\SchemaTest;
 
 use Override;
 
-use Slendium\Ocd\Common\SequentialValue;
 use Slendium\Ocd\Entity;
 
 /**
@@ -17,7 +16,7 @@ final readonly class EntityWithSequentialId implements Entity {
 	public function __construct(
 
 		#[Override]
-		public SequentialValue $id,
+		public Entity\SequentialValue $id,
 
 	) { }
 

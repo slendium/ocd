@@ -4,7 +4,6 @@ namespace Slendium\OcdTests\Unit\SchemaTest;
 
 use Override;
 
-use Slendium\Ocd\Common\UniqueIdentifier;
 use Slendium\Ocd\Entity;
 
 /**
@@ -15,7 +14,7 @@ use Slendium\Ocd\Entity;
 final readonly class EntityWithStaticConstructor implements Entity, Entity\FromFields {
 
 	public static function fromFields(
-		UniqueIdentifier $id,
+		Entity\UniqueIdentifier $id,
 		string $overrideName,
 	): self {
 		return new self($id, $overrideName);
@@ -24,7 +23,7 @@ final readonly class EntityWithStaticConstructor implements Entity, Entity\FromF
 	public function __construct(
 
 		#[Override]
-		public UniqueIdentifier $id,
+		public Entity\UniqueIdentifier $id,
 
 		public string $originalName,
 

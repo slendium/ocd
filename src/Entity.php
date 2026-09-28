@@ -2,9 +2,6 @@
 
 namespace Slendium\Ocd;
 
-use Slendium\Ocd\Common\SequentialValue;
-use Slendium\Ocd\Common\UniqueIdentifier;
-
 /**
  * A database-serializable object that is uniquely identifiable.
  *
@@ -51,6 +48,6 @@ use Slendium\Ocd\Common\UniqueIdentifier;
 interface Entity {
 
 	/** @since 1.0 */
-	public UniqueIdentifier|SequentialValue|string|int $id { get; }
+	public Entity\UniqueIdentifier|Entity\SequentialValue|string|int $id { get; }
 
 }

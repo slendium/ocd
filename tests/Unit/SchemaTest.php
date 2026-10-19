@@ -2,14 +2,15 @@
 
 namespace Slendium\OcdTests\Unit;
 
-use Exception;
-use OutOfBoundsException;
+use Throwable;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 use Slendium\Ocd\Entity\SequentialValue;
 use Slendium\Ocd\Entity\UniqueIdentifier;
 use Slendium\Ocd\Schema;
+use Slendium\OcdTests\Common\Entities as TestEntities;
 
 /**
  * @internal
@@ -18,15 +19,35 @@ use Slendium\Ocd\Schema;
  */
 final class SchemaTest extends TestCase {
 
-	public function test_fromClass_shouldThrow_whenEntityExcludesIdField(): void {
+	public static function definitionExceptionCases(): iterable { // @phpstan-ignore missingType.iterableValue
+		yield [ SchemaTest\EntityThatExcludesId::class ];
+		yield [ SchemaTest\EntityWithIdPropertyWithoutIdParameter::class ];
+
+		foreach (TestEntities::getAllInvalidClasses() as $class) {
+			yield [ $class ];
+		}
+	}
+
+	/** @param class-string $class */
+	#[DataProvider('definitionExceptionCases')]
+	public function test_fromClass_shouldThrow_whenClassDefinesInvalidSchema(string $class): void {
 		// Arrange
-		$sut = Schema::fromClass(SchemaTest\EntityThatExcludesId::class);
+		$sut = Schema::fromClass($class);
 
 		// Assert
 		$this->expectException(Schema\DefinitionException::class);
 
 		// Act
-		$_ = $sut->fields;
+		$_ = $sut->fields; // triggers lazy instantiation
+	}
+
+	public function test_fromClass_shouldIgnoreCustomPrimaryField_whenEntityGiven(): void {
+		$sut = Schema::fromClass(SchemaTest\EntityWithPrimaryOverride::class);
+
+		$result = $sut->primaries;
+
+		$this->assertSame(1, \count($result));
+		$this->assertSame('id', $result[0]->name);
 	}
 
 	public function test_fromClass_shouldIgnoreIdField_whenIdFieldOfRegularObjectIsExcluded(): void {
@@ -83,17 +104,6 @@ final class SchemaTest extends TestCase {
 		$this->assertTrue(isset($result['flag']));
 	}
 
-	public function test_fromClass_shouldThrow_whenEntityDoesNotDefineIdAsField(): void {
-		// Arrange
-		$sut = Schema::fromClass(SchemaTest\EntityWithIdPropertyWithoutIdParameter::class);
-
-		// Assert
-		$this->expectException(Schema\DefinitionException::class);
-
-		// Act
-		$_ = $sut->fields;
-	}
-
 	public function test_fromClass_shouldPreferStaticConstructorMethodOverRegularConstructor(): void {
 		$sut = Schema::fromClass(SchemaTest\EntityWithStaticConstructor::class);
 
@@ -105,61 +115,45 @@ final class SchemaTest extends TestCase {
 		$this->assertFalse(isset($result['originalName']));
 	}
 
-	public function test_fields_shouldRenameFields_whenDeclaredWithFieldNameAttribute(): void {
-		$sut = Schema::fromClass(SchemaTest\EntityWithRenamedField::class);
+	public function test_fromClass_shouldFindAllIndexes(): void {
+		$sut = Schema::fromClass(SchemaTest\EntityWithIndexes::class);
 
-		$result = $sut->fields;
+		$result = \array_map(fn($idx) => $idx->fields, $sut->indexes);
+
+		$this->assertSame(3, \count($result));
+		$this->assertEqualsCanonicalizing(SchemaTest\EntityWithIndexes::EXPECTED_INDEXES, $result);
+	}
+
+	public function test_fromClass_shouldAddImpliedIdPrimary_whenEntityGiven(): void {
+		$sut = Schema::fromClass(SchemaTest\EmptyEntity::class);
+
+		$result = $sut->primaries;
+
+		$this->assertSame(1, \count($result));
+		$this->assertSame('id', $result[0]->name);
+	}
+
+	public function test_fromClass_shouldFindAllPrimaries(): void {
+		$sut = Schema::fromClass(SchemaTest\ObjectWithPrimaryFields::class);
+
+		$result = \array_map(fn($pri) => $pri->name, $sut->primaries);
 
 		$this->assertSame(2, \count($result));
-		$this->assertTrue(isset($result['id']));
-		$this->assertTrue(isset($result['alternativeName']));
+		$this->assertEqualsCanonicalizing(SchemaTest\ObjectWithPrimaryFields::EXPECTED_PRIMARIES, $result);
 	}
 
-	public function test_fields_shouldThrow_whenSettingOffset(): void {
-		// Arrange
-		$sut = Schema::fromClass(SchemaTest\EntityWithScalarFields::class)->fields;
+	public function test_fromClass_shouldFindAllDeclaredConstraints(): void {
+		$sut = Schema::fromClass(SchemaTest\EntityWithExplicitConstraints::class);
 
-		// Assert
-		$this->expectException(Exception::class);
+		$result = $sut->constraints;
+		$invariants = \array_filter($result, fn($c) => $c instanceof Schema\Constraint\Invariant);
+		$uniques = \array_filter($result, fn($c) => $c instanceof Schema\Constraint\Unique);
+		$references = \array_filter($result, fn($c) => $c instanceof Schema\Constraint\Reference);
 
-		// Act
-		$sut['test'] = 1;
-	}
-
-	public function test_fields_shouldThrow_whenUnsettingOffset(): void {
-		// Arrange
-		$sut = Schema::fromClass(SchemaTest\EntityWithScalarFields::class)->fields;
-
-		// Assert
-		$this->expectException(Exception::class);
-
-		// Act
-		unset($sut['string']);
-	}
-
-	public function test_fields_getIterator_shouldNotThrow(): void {
-		$sut = Schema::fromClass(SchemaTest\EntityWithScalarFields::class)->fields;
-
-		$count = 0;
-		foreach ($sut as $name => $field) {
-			$this->assertIsString($name);
-			$this->assertInstanceOf(Schema\Field::class, $field);
-			$this->assertSame($name, $field->name);
-			$count += 1;
-		}
-
-		$this->assertSame(5, $count);
-	}
-
-	public function test_fields_getIterator_shouldUseRealFieldNameAsKey_whenFieldWasRenamed(): void {
-		// Arrange
-		$sut = Schema::fromClass(SchemaTest\EntityWithRenamedField::class)->fields;
-
-		// Act
-		foreach ($sut as $name => $field) {
-			// Assert
-			$this->assertSame($name, $field->name);
-		}
+		$this->assertSame(SchemaTest\EntityWithExplicitConstraints::EXPECTED_INVARIANTS, \count($invariants));
+		$this->assertSame(SchemaTest\EntityWithExplicitConstraints::EXPECTED_UNIQUES, \count($uniques));
+		$this->assertSame(SchemaTest\EntityWithExplicitConstraints::EXPECTED_REFERENCES, \count($references));
+		$this->assertSame(SchemaTest\EntityWithExplicitConstraints::EXPECTED_CONSTRAINTS, \count($result));
 	}
 
 	public function test_fields_shouldNotContainId_whenNonEntity(): void {
@@ -178,17 +172,6 @@ final class SchemaTest extends TestCase {
 		$this->assertTrue(isset($result['id']));
 	}
 
-	public function test_fields_shouldThrow_whenOffsetDoesNotExist(): void {
-		// Arrange
-		$sut = Schema::fromClass(SchemaTest\EmptyEntity::class);
-
-		// Assert
-		$this->expectException(OutOfBoundsException::class);
-
-		// Act
-		$_ = $sut->fields['does_not_exist'];
-	}
-
 	public function test_fields_shouldReturnField_whenOffsetExists(): void {
 		$sut = Schema::fromClass(SchemaTest\EntityWithScalarFields::class);
 
@@ -200,7 +183,7 @@ final class SchemaTest extends TestCase {
 	public function test_fields_shouldHaveIdWithSequentialValueType_whenEntityDeclaresOne(): void {
 		$sut = Schema::fromClass(SchemaTest\EntityWithSequentialId::class);
 
-		$result = Schema\TypeInfo::getSerializeType($sut->fields['id']->type::class); // @phpstan-ignore property.nonObject (the field will be found)
+		$result = Schema\TypeInfo::getSerializeType($sut->fields['id']->type::class);
 
 		$this->assertSame(SequentialValue::class, $result);
 	}
@@ -208,7 +191,7 @@ final class SchemaTest extends TestCase {
 	public function test_fields_shouldHaveIdWithUniqueIdentifierType_whenEntityDeclaresOne(): void {
 		$sut = Schema::fromClass(SchemaTest\EntityWithUniqueId::class);
 
-		$result = Schema\TypeInfo::getSerializeType($sut->fields['id']->type::class); // @phpstan-ignore property.nonObject (the field will be found)
+		$result = Schema\TypeInfo::getSerializeType($sut->fields['id']->type::class);
 
 		$this->assertSame(UniqueIdentifier::class, $result);
 	}

@@ -12,15 +12,15 @@ use Slendium\Ocd\Schema;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class EntityWithRenamedField implements Entity {
+#[Schema\PrimaryFields([ 'code' ])]
+final readonly class EntityWithPrimaryOverride implements Entity {
 
 	public function __construct(
 
 		#[Override]
-		public string $id,
+		public Entity\UniqueIdentifier $id,
 
-		#[Schema\FieldName('alternativeName')]
-		public string $realName,
+		public string $code,
 
 	) { }
 

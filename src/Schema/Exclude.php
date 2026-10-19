@@ -4,6 +4,8 @@ namespace Slendium\Ocd\Schema;
 
 use Attribute;
 
+use Slendium\Ocd\Common\MarkerAttribute;
+
 /**
  * Marker to exclude a target from the schema.
  *
@@ -12,4 +14,8 @@ use Attribute;
  * @copyright Slendium 2026
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class Exclude { }
+final readonly class Exclude {
+
+	use MarkerAttribute;
+
+}

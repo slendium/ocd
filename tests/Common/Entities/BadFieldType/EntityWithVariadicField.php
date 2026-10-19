@@ -1,6 +1,6 @@
 <?php
 
-namespace Slendium\OcdTests\Unit\Schema\FieldTest;
+namespace Slendium\OcdTests\Common\Entities\BadFieldType;
 
 use Override;
 
@@ -11,16 +11,15 @@ use Slendium\Ocd\Entity;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class VariadicFieldEntity implements Entity {
+final class EntityWithVariadicField implements Entity {
 
 	public function __construct( // @phpstan-ignore constructor.unusedParameter
 
 		#[Override]
-		public string $id,
+		public readonly Entity\UniqueIdentifier $id,
 
-		string ...$variadic,
+		string ...$field,
 
 	) { }
-
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Slendium\OcdTests\Unit\Schema\FieldTest;
+namespace Slendium\OcdTests\Common\Entities;
 
 use Override;
 
@@ -11,16 +11,13 @@ use Slendium\Ocd\Entity;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class UnionTypedFieldEntity implements Entity {
+final readonly class EntityWithId implements Entity {
 
 	public function __construct(
 
 		#[Override]
-		public string $id,
-
-		public float|int $union,
+		public Entity\UniqueIdentifier $id,
 
 	) { }
-
 
 }

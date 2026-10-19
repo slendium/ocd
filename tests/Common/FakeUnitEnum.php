@@ -1,6 +1,6 @@
 <?php
 
-namespace Slendium\OcdTests\Unit\Schema\FieldTest;
+namespace Slendium\OcdTests\Common;
 
 /**
  * @internal

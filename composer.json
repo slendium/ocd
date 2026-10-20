@@ -7,14 +7,16 @@
 	},
 	"require-dev": {
 		"phpstan/phpstan": "^2.2",
-		"phpunit/phpunit": "^13.2"
+		"phpunit/phpunit": "^13.2",
+		"phpbench/phpbench": "^1.7"
 	},
 	"license": "MIT",
 	"autoload": { "psr-4": {
 		"Slendium\\Ocd\\": "src/"
 	} },
 	"autoload-dev": { "psr-4": {
-		"Slendium\\OcdTests\\": "tests/"
+		"Slendium\\OcdTests\\": "tests/",
+		"Slendium\\OcdBench\\": "benchmarks/"
 	} },
 	"authors": [
 		{

@@ -4,5 +4,6 @@ parameters:
 	bootstrapFiles:
 		- vendor/autoload.php
 	paths:
+		- benchmarks
 		- src
 		- tests

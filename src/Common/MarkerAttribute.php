@@ -21,10 +21,7 @@ trait MarkerAttribute {
 	 * @internal
 	 */
 	public static function isMarked(ReflectionClass|ReflectionParameter $reflector): bool {
-		foreach ($reflector->getAttributes(static::class) as $_) {
-			return true;
-		}
-		return false;
+		return Attributes::isMarked($reflector, static::class);
 	}
 
 	/**
@@ -32,10 +29,7 @@ trait MarkerAttribute {
 	 * @internal
 	 */
 	public static function getInstance(ReflectionClass|ReflectionParameter $reflector): ?static {
-		foreach ($reflector->getAttributes(static::class) as $attr) {
-			return $attr->newInstance();
-		}
-		return null;
+		return Attributes::getFirstInstance($reflector, static::class);
 	}
 
 }

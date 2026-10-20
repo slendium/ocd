@@ -12,6 +12,26 @@ namespace Slendium\Ocd;
 interface Database {
 
 	/**
+	 * Checks if the database implementation supports the given feature.
+	 * @since 1.0
+	 */
+	public function supports(Database\Feature $feature): bool;
+
+	/**
+	 * Applies the given schema to the given collection, creating one if it does not yet exist.
+	 *
+	 * {@see Database\UpgradeOptions} can be used for more control over the behavior of the schema
+	 * upgrade, such as which - if any - data losses to allow.
+	 *
+	 * Not all properties of the schema may be enforced by the database implementation.
+	 * Use {@see ::supports()} to check which are supported.
+	 *
+	 * @since 1.0
+	 * @param non-empty-string $collection The name of the collection for which to enforce the schema
+	 */
+	public function applySchema(string $collection, Schema $schema): Database\UpgradeCommand;
+
+	/**
 	 * Returns all existing collections.
 	 * @since 1.0
 	 * @return list<non-empty-string>

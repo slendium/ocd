@@ -3,9 +3,9 @@
 Database- and framework agnostic database abstraction layer / ORM for PHP.
 
 * Supports MongoDB and SQL-based databases, can be extended further
-* Supports custom / derived types as long as they go back to the same primitives
 * Entities are based on plain PHP classes, adding `#[Attribute]`'s only where more specificity is needed
 * Does not force the active record pattern, inheritance, or a rich domain model (nor exclude them)
+* Supports custom types
 * No LLM-generated code
 * No dependencies
 
@@ -13,7 +13,7 @@ Database- and framework agnostic database abstraction layer / ORM for PHP.
 
 Requires **PHP >= 8.5**.
 Run `composer require slendium/ocd` to add it to your project.
-However, most likely you are looking for a database-specific implementation of the library:
+To use the ORM you also need to add one of the database-specific implementations:
 
 * [MariaDB](https://git.frisiapp.com/slendium/ocd-mariadb)
 * [SQLite](https://git.frisiapp.com/slendium/ocd-sqlite)
@@ -27,9 +27,7 @@ which contains implementation guides and PHPUnit tests.
 
 ### Data definition
 
-#### Basic entity
-
-A basic entity only requires a plain PHP class declaration.
+An entity can be declared just like any PHP class, adding `#[Attribute]`'s where needed.
 
 ```php
 final readonly class Product implements Entity {
@@ -39,11 +37,27 @@ final readonly class Product implements Entity {
 		#[Override]
 		public Entity\UniqueIdentifier $id,
 
+		#[Schema\Field\Indexed]
+		public DateTimeImmutable $createdAt,
+
 		public string $name,
+
+		// Declare an explicit type when the defaults are not a good fit
+		#[Schema\Types\String_(characterLimit: 12), Schema\Constraint\Unique]
+		public string $sku,
 
 		public float $price,
 
-		public bool $visible = false,
+		// Declares semi-structured data on the entity (nested documents in MongoDB, JSON in SQL)
+		public array $details,
+
+		// Automatically create references to other entities (aka. foreign keys)
+		public Category $category,
+
+		// Backed enums automatically become part of the schema
+		public Condition $condition = Condition::New,
+
+		public bool $isVisible = false,
 
 		public int $stock = 0,
 
@@ -51,10 +65,6 @@ final readonly class Product implements Entity {
 
 }
 ```
-
-#### Relationships and indices
-
-TODO
 
 ### Querying
 
@@ -144,9 +154,10 @@ $collection->startDelete($filter)
 1. **[Done]** Describing the schema
 1. **[Done]** Data manipulation (create, update, delete)
 1. **[Done]** Reading queried data from a cursor
-1. Relationships and indices
+1. **[Done]** Relationships and indices
 1. Entity reassembly
 1. Geospatial data
+1. Subquery support
 1. Data aggregation
 1. Transactions
 

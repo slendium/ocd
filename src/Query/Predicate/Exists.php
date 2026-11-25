@@ -4,9 +4,9 @@ namespace Slendium\Ocd\Query\Predicate;
 
 use Override;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Predicate;
 use Slendium\Ocd\Query\PredicateVisitor;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * Evaluates to `true` if the field exists in the object.
@@ -21,7 +21,7 @@ final readonly class Exists implements Predicate {
 	public function __construct(
 
 		/** @since 1.0 */
-		public FieldPath $field,
+		public ValuePath $path,
 
 	) { }
 

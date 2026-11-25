@@ -4,7 +4,7 @@ namespace Slendium\Ocd\Query;
 
 use Closure;
 
-use Slendium\Ocd\Common\FieldPath;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * Builder utility for document updates.
@@ -20,9 +20,9 @@ use Slendium\Ocd\Common\FieldPath;
  * 	'name' => 'new literal name',
  * 	'stock' => SET::add(1),
  * 	'reviews' => SET::multiple(
- * 		SET::if($text !== '', SET::path([ 'texts' ], SET::append([ $text ]))),
- * 		SET::path([ 'sumOfScores' ], SET::add(0.8)),
- * 		SET::path([ 'count' ], SET::add(1))
+ * 		SET::if($text !== '', SET::innerValue([ 'texts' ], SET::append([ $text ]))),
+ * 		SET::innerValue([ 'sumOfScores' ], SET::add(0.8)),
+ * 		SET::innerValue([ 'count' ], SET::add(1))
  * 	)
  * ]);
  * ```
@@ -47,13 +47,13 @@ final class DocumentUpdate {
 		$out = [ ];
 		foreach ($specs as $field => $spec) {
 			if ($spec instanceof Closure) {
-				/** @var Closure(FieldPath):iterable<Update> $spec */
-				$stmts = $spec(new FieldPath([ $field ]));
+				/** @var Closure(ValuePath):iterable<Update> $spec */
+				$stmts = $spec(new ValuePath([ $field ]));
 				foreach ($stmts as $stmt) {
 					$out[] = $stmt;
 				}
 			} else {
-				$out[] = new Update\Set(new FieldPath([ $field ]), $spec);
+				$out[] = new Update\Set(new ValuePath([ $field ]), $spec);
 			}
 		}
 		return $out;
@@ -61,67 +61,67 @@ final class DocumentUpdate {
 
 	/**
 	 * @since 1.0
-	 * @return Closure(FieldPath):iterable<Update\Set>
+	 * @return Closure(ValuePath):iterable<Update\Set>
 	 */
 	public static function set(mixed $value): Closure {
-		return static fn(FieldPath $field) => yield new Update\Set($field, $value);
+		return static fn(ValuePath $path) => yield new Update\Set($path, $value);
 	}
 
 	/**
 	 * @since 1.0
-	 * @return Closure(FieldPath):iterable<Update\Unset_>
+	 * @return Closure(ValuePath):iterable<Update\Unset_>
 	 */
 	public static function unset(): Closure {
-		return static fn(FieldPath $field) => yield new Update\Unset_($field);
+		return static fn(ValuePath $path) => yield new Update\Unset_($path);
 	}
 
 	/**
 	 * @since 1.0
-	 * @return Closure(FieldPath):iterable<Update\Add>
+	 * @return Closure(ValuePath):iterable<Update\Add>
 	 */
 	public static function add(float|int $amount): Closure {
-		return static fn(FieldPath $field) => yield new Update\Add($field, $amount);
+		return static fn(ValuePath $path) => yield new Update\Add($path, $amount);
 	}
 
 	/**
 	 * @since 1.0
-	 * @return Closure(FieldPath):iterable<Update\Multiply>
+	 * @return Closure(ValuePath):iterable<Update\Multiply>
 	 */
 	public static function multiply(float|int $amount): Closure {
-		return static fn(FieldPath $field) => yield new Update\Multiply($field, $amount);
+		return static fn(ValuePath $path) => yield new Update\Multiply($path, $amount);
 	}
 
 	/**
 	 * @since 1.0
-	 * @return Closure(FieldPath):iterable<Update\Append>
+	 * @return Closure(ValuePath):iterable<Update\Append>
 	 */
 	public static function append(mixed $value): Closure {
-		return static fn(FieldPath $field) => yield new Update\Append($field, $value);
+		return static fn(ValuePath $path) => yield new Update\Append($path, $value);
 	}
 
 	/**
 	 * @since 1.0
-	 * @param Closure(FieldPath):iterable<Update> $update
-	 * @param Closure(FieldPath):iterable<Update> ...$remainder
-	 * @return Closure(FieldPath):iterable<Update>
+	 * @param Closure(ValuePath):iterable<Update> $update
+	 * @param Closure(ValuePath):iterable<Update> ...$remainder
+	 * @return Closure(ValuePath):iterable<Update>
 	 */
 	public static function multiple(Closure $update, Closure ...$remainder): Closure {
-		return static function(FieldPath $field) use ($update, $remainder) {
-			yield from $update($field);
+		return static function(ValuePath $path) use ($update, $remainder) {
+			yield from $update($path);
 			foreach ($remainder as $closure) {
-				yield from $closure($field);
+				yield from $closure($path);
 			}
 		};
 	}
 
 	/**
 	 * @since 1.0
-	 * @param Closure(FieldPath):iterable<Update> $then
-	 * @param ?Closure(FieldPath):iterable<Update> $else
-	 * @return Closure(FieldPath):iterable<Update>
+	 * @param Closure(ValuePath):iterable<Update> $then
+	 * @param ?Closure(ValuePath):iterable<Update> $else
+	 * @return Closure(ValuePath):iterable<Update>
 	 */
 	public static function if(bool $condition, Closure $then, ?Closure $else = null): Closure {
-		return static function(FieldPath $field) use ($condition, $then, $else) {
+		return static function(ValuePath $field) use ($condition, $then, $else) {
 			if ($condition) {
 				yield from $then($field);
 			} else if ($else !== null) {
@@ -131,13 +131,16 @@ final class DocumentUpdate {
 	}
 
 	/**
+	 * Creates a path into a nested structure to update an inner value.
 	 * @since 1.0
-	 * @param non-empty-list<non-empty-string> $parts
-	 * @param Closure(FieldPath):iterable<Update> $wrappee
-	 * @return Closure(FieldPath):iterable<Update>
+	 * @param non-empty-list<string> $parts
+	 * @param Closure(ValuePath):iterable<Update> $update
+	 * @return Closure(ValuePath):iterable<Update>
 	 */
-	public static function path(array $parts, Closure $wrappee): Closure {
-		return static fn(FieldPath $base) => yield from $wrappee(new FieldPath([ ...$base->path, ...$parts ]));
+	public static function innerValue(array $parts, Closure $update): Closure {
+		return static function(ValuePath $base) use ($parts, $update) {
+			yield from $update(new ValuePath($base->fieldPath, $parts));
+		};
 	}
 
 }

@@ -4,8 +4,8 @@ namespace Slendium\OcdTests\Unit\Query\Predicate;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Predicate;
+use Slendium\Ocd\Query\ValuePath;
 
 use Slendium\OcdTests\Unit\Query\MockPredicateVisitor;
 
@@ -19,17 +19,17 @@ use Slendium\OcdTests\Unit\Query\MockPredicateVisitor;
 final class MatchRegexTest extends TestCase {
 
 	public function test___construct_shouldNotThrow(): void {
-		$field = new FieldPath([ 'test' ]);
+		$path = new ValuePath([ 'test' ]);
 		$regex = '^test';
 
-		$result = new Predicate\MatchRegex(field: $field, regex: $regex);
+		$result = new Predicate\MatchRegex(valueAt: $path, regex: $regex);
 
-		$this->assertSame($field, $result->field);
+		$this->assertSame($path, $result->valueAt);
 		$this->assertSame($regex, $result->regex);
 	}
 
 	public function test_accept_shouldCallAppropriateMethod(): void {
-		$sut = new Predicate\MatchRegex(new FieldPath([ 'foo' ]), '^bar');
+		$sut = new Predicate\MatchRegex(new ValuePath([ 'foo' ]), '^bar');
 		$called = false;
 		$mock = new MockPredicateVisitor([ 'visitMatchRegex' => function() use (&$called) { $called = true; } ]);
 

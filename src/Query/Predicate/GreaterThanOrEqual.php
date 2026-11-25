@@ -5,9 +5,9 @@ namespace Slendium\Ocd\Query\Predicate;
 use DateTimeInterface;
 use Override;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Predicate;
 use Slendium\Ocd\Query\PredicateVisitor;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * Evaluates to `true` if the left-hand-side is greater than or equal to the right-hand-side.
@@ -22,10 +22,10 @@ final readonly class GreaterThanOrEqual implements Predicate {
 	public function __construct(
 
 		/** @since 1.0 */
-		public FieldPath|DateTimeInterface|float|int $lhs,
+		public ValuePath|DateTimeInterface|float|int $lhs,
 
 		/** @since 1.0 */
-		public FieldPath|DateTimeInterface|float|int $rhs,
+		public ValuePath|DateTimeInterface|float|int $rhs,
 
 	) { }
 

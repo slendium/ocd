@@ -2,13 +2,17 @@
 
 namespace Slendium\OcdTests\Unit\Query;
 
+use Closure;
 use DateTime;
+use LogicException;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Predicate;
+use Slendium\Ocd\Query\PredicateAggregate;
 use Slendium\Ocd\Query\DocumentShape as Q;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * @internal
@@ -17,80 +21,133 @@ use Slendium\Ocd\Query\DocumentShape as Q;
  */
 final class DocumentShapeTest extends TestCase {
 
-	public function test_shape_shouldEvaluateClosuresImmediately(): void {
-		$field = 'test';
-		$rhs = 5;
-		$shape = [ $field => static fn(FieldPath $path) => new Predicate\GreaterThanOrEqual($path, $rhs) ];
+	public function test_createForId_shouldCreateIdEqualsPredicate(): void {
+		$id = 'ab159a27-c293-4759-926e-5caf20a0cef3';
 
-		$result = Q::shape($shape);
+		$result = Q::createForId($id);
 
-		$this->assertSame(1, \count($result->inputs));
-		$this->assertInstanceOf(Predicate\GreaterThanOrEqual::class, $result->inputs[0]);
-		$this->assertInstanceOf(FieldPath::class, $result->inputs[0]->lhs);
-		$this->assertSame([ $field ], $result->inputs[0]->lhs->path);
-		$this->assertSame($rhs, $result->inputs[0]->rhs);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ 'id' ], $result->lhs->fieldPath);
+		$this->assertSame([ ], $result->lhs->innerPath);
+		$this->assertSame($id, $result->rhs);
 	}
 
-	public function test_shape_shouldEvaluateNonClosureAsEqualsPredicate(): void {
+	public static function aggregators(): iterable { // @phpstan-ignore missingType.iterableValue
+		yield [ self::newAnd(...) ];
+		yield [ self::newOr(...) ];
+	}
+
+	/** @param Closure(non-empty-list<Predicate>):PredicateAggregate $aggregate */
+	#[DataProvider('aggregators')]
+	public function test_create_shouldProduceExpectedResult(Closure $aggregate): void {
+		$expectedEqual = 'string';
+		$expectedGte = 0;
 		$shape = [
-			'string' => 'string',
-			'int' => 10,
-			'float' => 1.5,
-			'bool' => true,
-			'null' => null
+			'equal' => $expectedEqual,
+			'gte' => fn(ValuePath $path) => new Predicate\GreaterThanOrEqual($path, $expectedGte)
 		];
 
-		$result = Q::shape($shape);
+		$result = Q::create($shape, $aggregate);
 
-		$this->assertSame(5, \count($result->inputs));
+		$this->assertSame(2, \count($result->inputs));
 		foreach ($result->inputs as $predicate) {
-			$this->assertInstanceOf(Predicate\Equal::class, $predicate);
-			$this->assertInstanceOf(FieldPath::class, $predicate->lhs);
-			$this->assertSame($shape[$predicate->lhs->path[0]], $predicate->rhs);
-		}
-	}
-
-	public function test_and_shouldEvaluateAsNestedShape(): void {
-		$and = [
-			'positive' => static fn(FieldPath $path) => new Predicate\GreaterThan($path, 0),
-			'string' => 'string',
-			'int' => -5,
-			'float' => 1.0,
-			'bool' => false,
-			'null' => null
-		];
-
-		$result = Q::shape([ 'test' => Q::and($and) ]);
-
-		$this->assertInstanceOf(Predicate\And_::class, $result->inputs[0]);
-		$this->assertSame(6, \count($result->inputs[0]->inputs));
-		foreach ($result->inputs[0]->inputs as $predicate) {
-			if ($predicate instanceof Predicate\Equal || $predicate instanceof Predicate\GreaterThan) {
-				$this->assertInstanceOf(FieldPath::class, $predicate->lhs);
-				$this->assertSame(2, \count($predicate->lhs->path));
+			if ($predicate instanceof Predicate\Equal) {
+				$this->assertInstanceOf(ValuePath::class, $predicate->lhs);
+				$this->assertSame([ 'equal' ], $predicate->lhs->fieldPath);
+				$this->assertSame($expectedEqual, $predicate->rhs);
+			} else if ($predicate instanceof Predicate\GreaterThanOrEqual) {
+				$this->assertInstanceOf(ValuePath::class, $predicate->lhs);
+				$this->assertSame([ 'gte' ], $predicate->lhs->fieldPath);
+				$this->assertSame($expectedGte, $predicate->rhs);
 			}
 		}
 	}
 
-	public function test_or_shouldEvaluateAsNestedShape(): void {
-		$or = [
-			'positive' => static fn(FieldPath $path) => new Predicate\GreaterThan($path, 0),
-			'string' => 'string',
-			'int' => -5,
-			'float' => 1.0,
-			'bool' => false,
-			'null' => null
-		];
+	/** @param Closure(non-empty-list<Predicate>):PredicateAggregate $aggregate */
+	#[DataProvider('aggregators')]
+	public function test_referenceShape_shouldProduceExpectedPredicate(Closure $aggregate): void {
+		$expectedEqual = 1;
+		$expectedGt = 2;
+		$shape = [ 'a' => $expectedEqual, 'b' => fn(ValuePath $path) => new Predicate\GreaterThan($path, $expectedGt) ];
+		$fieldPath = [ 'foo' ];
+		$path = new ValuePath($fieldPath);
 
-		$result = Q::shape([ 'test' => Q::or($or) ]);
+		$result = Q::referenceShape($shape, $aggregate)($path);
 
-		$this->assertInstanceOf(Predicate\Or_::class, $result->inputs[0]);
-		foreach ($result->inputs[0]->inputs as $predicate) {
-			if ($predicate instanceof Predicate\Equal || $predicate instanceof Predicate\GreaterThan) {
-				$this->assertInstanceOf(FieldPath::class, $predicate->lhs);
-				$this->assertSame(2, \count($predicate->lhs->path));
-			}
-		}
+		$this->assertSame(\count($shape), \count($result->inputs));
+		$this->assertInstanceOf(Predicate\Equal::class, $result->inputs[0]);
+		$this->assertInstanceOf(ValuePath::class, $result->inputs[0]->lhs);
+		$this->assertSame([ ...$fieldPath, 'a' ], $result->inputs[0]->lhs->fieldPath);
+		$this->assertSame([ ], $result->inputs[0]->lhs->innerPath);
+		$this->assertSame($expectedEqual, $result->inputs[0]->rhs);
+		$this->assertInstanceOf(Predicate\GreaterThan::class, $result->inputs[1]);
+		$this->assertInstanceOf(ValuePath::class, $result->inputs[1]->lhs);
+		$this->assertSame([ ...$fieldPath, 'b' ], $result->inputs[1]->lhs->fieldPath);
+		$this->assertSame([ ], $result->inputs[1]->lhs->innerPath);
+		$this->assertSame($expectedGt, $result->inputs[1]->rhs);
+	}
+
+	/** @param Closure(non-empty-list<Predicate>):PredicateAggregate $aggregate */
+	#[DataProvider('aggregators')]
+	public function test_referenceShape_shouldThrow_whenInnerPathNonEmpty(Closure $aggregate): void {
+		// Arrange
+		$path = new ValuePath([ 'foo' ], [ 'bar' ]);
+
+		// Assert
+		$this->expectException(LogicException::class);
+
+		// Act
+		$result = Q::referenceShape([ 'a' => 1 ], $aggregate)($path);
+	}
+
+	/** @param Closure(non-empty-list<Predicate>):PredicateAggregate $aggregate */
+	#[DataProvider('aggregators')]
+	public function test_fieldShape_shouldProduceExpectedPredicate(Closure $aggregate): void {
+		$expectEqual = 1;
+		$expectGt = 2;
+		$shape = [ 'a' => $expectEqual, 'b' => fn(ValuePath $path) => new Predicate\GreaterThan($path, $expectGt) ];
+		$path = new ValuePath([ 'foo' ]);
+
+		$result = Q::fieldShape($shape, $aggregate)($path);
+
+		$this->assertSame(\count($shape), \count($result->inputs));
+		[ $pred0, $pred1 ] = $result->inputs;
+		$this->assertInstanceOf(Predicate\Equal::class, $pred0);
+		$this->assertInstanceOf(ValuePath::class, $pred0->lhs);
+		$this->assertSame([ 'foo' ], $pred0->lhs->fieldPath);
+		$this->assertSame([ 'a' ], $pred0->lhs->innerPath);
+		$this->assertSame($expectEqual, $pred0->rhs);
+		$this->assertInstanceOf(Predicate\GreaterThan::class, $pred1);
+		$this->assertInstanceOf(ValuePath::class, $pred1->lhs);
+		$this->assertSame([ 'foo' ], $pred1->lhs->fieldPath);
+		$this->assertSame([ 'b' ], $pred1->lhs->innerPath);
+		$this->assertSame($expectGt, $pred1->rhs);
+	}
+
+	public static function logicalMethods(): iterable { // @phpstan-ignore missingType.iterableValue
+		yield [ 'and' ];
+		yield [ 'or' ];
+	}
+
+	/** @param 'and'|'or' $method */
+	#[DataProvider('logicalMethods')]
+	public function test_logicalMethod_shouldProduceExpectedCompositePredicate(string $method): void {
+		$path = [ 'foo' ];
+		$expectGt = 0;
+		$expectNeq = -1;
+		$inputs = [ Q::gt($expectGt), Q::neq($expectNeq) ];
+
+		$result = [ Q::class, $method ]($inputs)(new ValuePath($path));
+
+		$this->assertSame(\count($inputs), \count($result->inputs));
+		$this->assertInstanceOf(Predicate\GreaterThan::class, $result->inputs[0]);
+		$this->assertInstanceOf(ValuePath::class, $result->inputs[0]->lhs);
+		$this->assertSame($path, $result->inputs[0]->lhs->fieldPath);
+		$this->assertSame($expectGt, $result->inputs[0]->rhs);
+		$this->assertInstanceOf(Predicate\NotEqual::class, $result->inputs[1]);
+		$this->assertInstanceOf(ValuePath::class, $result->inputs[1]->lhs);
+		$this->assertSame($path, $result->inputs[1]->lhs->fieldPath);
+		$this->assertSame($expectNeq, $result->inputs[1]->rhs);
 	}
 
 	public function test_eq_shouldProduceValidPredicate(): void {
@@ -98,22 +155,22 @@ final class DocumentShapeTest extends TestCase {
 		$rhsValue = true;
 		$sut = Q::eq($rhsValue);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($rhsValue, $result->rhs);
 	}
 
-	public function test_notEqual_shouldProduceValidPredicate(): void {
+	public function test_neq_shouldProduceValidPredicate(): void {
 		$field = 'test';
 		$rhsValue = 5;
-		$sut = Q::notEqual($rhsValue);
+		$sut = Q::neq($rhsValue);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($rhsValue, $result->rhs);
 	}
 
@@ -122,10 +179,10 @@ final class DocumentShapeTest extends TestCase {
 		$rhsValue = 1;
 		$sut = Q::gt($rhsValue);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($rhsValue, $result->rhs);
 	}
 
@@ -134,10 +191,10 @@ final class DocumentShapeTest extends TestCase {
 		$rhsValue = -3;
 		$sut = Q::gte($rhsValue);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($rhsValue, $result->rhs);
 	}
 
@@ -146,10 +203,10 @@ final class DocumentShapeTest extends TestCase {
 		$rhsValue = 99;
 		$sut = Q::lt($rhsValue);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($rhsValue, $result->rhs);
 	}
 
@@ -158,10 +215,10 @@ final class DocumentShapeTest extends TestCase {
 		$rhsValue = 42;
 		$sut = Q::lte($rhsValue);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($rhsValue, $result->rhs);
 	}
 
@@ -170,9 +227,9 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'test';
 		$sut = Q::matchAll($expectedResult);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertSame([ $field ], $result->field->path);
+		$this->assertSame([ $field ], $result->valueAt->fieldPath);
 		$this->assertSame($expectedResult, $result->values);
 	}
 
@@ -181,9 +238,9 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'test';
 		$sut = Q::matchSome($expectedResult);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertSame([ $field ], $result->field->path);
+		$this->assertSame([ $field ], $result->valueAt->fieldPath);
 		$this->assertSame($expectedResult, $result->values);
 	}
 
@@ -192,9 +249,9 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'test';
 		$sut = Q::matchNone($expectedResult);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertSame([ $field ], $result->field->path);
+		$this->assertSame([ $field ], $result->valueAt->fieldPath);
 		$this->assertSame($expectedResult, $result->values);
 	}
 
@@ -203,9 +260,9 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'test';
 		$sut = Q::regex($expectedResult);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertSame([ $field ], $result->field->path);
+		$this->assertSame([ $field ], $result->valueAt->fieldPath);
 		$this->assertSame($expectedResult, $result->regex);
 	}
 
@@ -214,15 +271,15 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'test';
 		$checkNotExists = false;
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
 		$this->assertInstanceOf(Predicate\Or_::class, $result);
 		foreach ($result->inputs as $predicate) {
 			if ($predicate instanceof Predicate\NotExists) {
 				$checkNotExists = true;
-				$this->assertSame([ $field ], $predicate->field->path);
+				$this->assertSame([ $field ], $predicate->path->fieldPath);
 			} else if ($predicate instanceof Predicate\MatchSome) {
-				$this->assertSame([ $field ], $predicate->field->path);
+				$this->assertSame([ $field ], $predicate->valueAt->fieldPath);
 				$this->assertContains('', $predicate->values);
 				$this->assertContains(null, $predicate->values);
 			}
@@ -235,15 +292,15 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'test';
 		$checkExists = false;
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
 		$this->assertInstanceOf(Predicate\And_::class, $result);
 		foreach ($result->inputs as $predicate) {
 			if ($predicate instanceof Predicate\Exists) {
 				$checkExists = true;
-				$this->assertSame([ $field ], $predicate->field->path);
+				$this->assertSame([ $field ], $predicate->path->fieldPath);
 			} else if ($predicate instanceof Predicate\MatchNone) {
-				$this->assertSame([ $field ], $predicate->field->path);
+				$this->assertSame([ $field ], $predicate->valueAt->fieldPath);
 				$this->assertContains('', $predicate->values);
 				$this->assertContains(null, $predicate->values);
 			}
@@ -256,10 +313,10 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'foo';
 		$sut = Q::before($expectedResult);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($expectedResult, $result->rhs);
 	}
 
@@ -268,10 +325,10 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'foo';
 		$sut = Q::onOrBefore($expectedResult);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($expectedResult, $result->rhs);
 	}
 
@@ -280,10 +337,10 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'foo';
 		$sut = Q::after($expectedResult);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($expectedResult, $result->rhs);
 	}
 
@@ -292,37 +349,31 @@ final class DocumentShapeTest extends TestCase {
 		$field = 'foo';
 		$sut = Q::onOrAfter($expectedResult);
 
-		$result = $sut(new FieldPath([ $field ]));
+		$result = $sut(new ValuePath([ $field ]));
 
-		$this->assertInstanceOf(FieldPath::class, $result->lhs);
-		$this->assertSame([ $field ], $result->lhs->path);
+		$this->assertInstanceOf(ValuePath::class, $result->lhs);
+		$this->assertSame([ $field ], $result->lhs->fieldPath);
 		$this->assertSame($expectedResult, $result->rhs);
 	}
 
-	public function test_path_shouldProduceMergedPath(): void {
-		$topLevelPart = 'test';
-		$topLevelField = new FieldPath([ $topLevelPart ]);
-		$part1 = 'inner1';
-		$part2 = 'inner2';
-		$expectedPath = [ $topLevelPart, $part1, $part2 ];
-		$resultPath = null;
-		$sut = Q::path([ $part1, $part2 ], static function($field) use (&$resultPath) {
-			$resultPath = $field->path;
-			return new Predicate\Exists($field);
-		});
+	public function test_valueAt_shouldReturnExpectedResult(): void {
+		$fieldPath = [ 'reference', 'field' ];
+		$innerPath = [ 'path', 'in', '0', 'json' ];
 
-		$result = $sut($topLevelField);
+		$result = Q::valueAt($fieldPath, $innerPath);
 
-		$this->assertInstanceOf(Predicate\Exists::class, $result);
-		$this->assertSame($expectedPath, $result->field->path);
+		$this->assertSame($fieldPath, $result->fieldPath);
+		$this->assertSame($innerPath, $result->innerPath);
 	}
 
-	public function test_field_shouldReturnExpectedResult_whenInvokedWithArray(): void {
-		$field = [ 'test', 'inner' ];
+	/** @param non-empty-list<Predicate> $inputs */
+	private static function newAnd(array $inputs): Predicate\And_ {
+		return new Predicate\And_($inputs);
+	}
 
-		$result = Q::field($field);
-
-		$this->assertSame($field, $result->path);
+	/** @param non-empty-list<Predicate> $inputs */
+	private static function newOr(array $inputs): Predicate\Or_ {
+		return new Predicate\Or_($inputs);
 	}
 
 }

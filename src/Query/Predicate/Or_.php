@@ -5,6 +5,7 @@ namespace Slendium\Ocd\Query\Predicate;
 use Override;
 
 use Slendium\Ocd\Query\Predicate;
+use Slendium\Ocd\Query\PredicateAggregate;
 use Slendium\Ocd\Query\PredicateVisitor;
 
 /**
@@ -14,15 +15,13 @@ use Slendium\Ocd\Query\PredicateVisitor;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-final readonly class Or_ implements Predicate {
+final readonly class Or_ implements PredicateAggregate {
 
 	/** @since 1.0 */
 	public function __construct(
 
-		/**
-		 * @since 1.0
-		 * @var non-empty-list<Predicate>
-		 */
+		/** @var non-empty-list<Predicate> */
+		#[Override]
 		public array $inputs,
 
 	) { }

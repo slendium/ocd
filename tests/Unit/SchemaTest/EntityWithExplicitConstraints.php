@@ -5,10 +5,10 @@ namespace Slendium\OcdTests\Unit\SchemaTest;
 use DateTimeImmutable;
 use Override;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Entity;
 use Slendium\Ocd\Schema;
 use Slendium\Ocd\Query\Predicate;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * @internal
@@ -33,11 +33,11 @@ final readonly class EntityWithExplicitConstraints implements Entity {
 	const EXPECTED_CONSTRAINTS = self::EXPECTED_INVARIANTS + self::EXPECTED_UNIQUES + self::EXPECTED_REFERENCES + 1;
 
 	private const INVARIANT_COUNT_GREATER_THAN_ZERO = static function(): Predicate {
-		return new Predicate\GreaterThan(new FieldPath([ 'count' ]), 0);
+		return new Predicate\GreaterThan(new ValuePath([ 'count' ]), 0);
 	};
 
 	private const INVARIANT_NAME_ALPHANUMERIC = static function(): Predicate {
-		return new Predicate\MatchRegex(new FieldPath([ 'name' ]), '^[a-zA-Z_0-9]+');
+		return new Predicate\MatchRegex(new ValuePath([ 'name' ]), '^[a-zA-Z_0-9]+');
 	};
 
 	public function __construct(

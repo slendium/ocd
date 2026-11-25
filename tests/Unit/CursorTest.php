@@ -15,7 +15,7 @@ use Slendium\Ocd\Query\DocumentShape as Q;
 final class CursorTest extends TestCase {
 
 	public function test_filter_shouldApplyPredicate(): void {
-		$expectedResult = Q::shape([ 'id' => '22' ]);
+		$expectedResult = Q::createForId('22');
 		$filterable = new CursorTest\FakeFilterable;
 
 		$result = Cursor::filter($filterable, $expectedResult)->filter;

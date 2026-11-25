@@ -6,9 +6,9 @@ use BackedEnum;
 use DateTimeInterface;
 use Override;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Predicate;
 use Slendium\Ocd\Query\PredicateVisitor;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * Evaluates to `true` if the given field matches none of the values given exactly.
@@ -25,7 +25,7 @@ final readonly class MatchNone implements Predicate {
 	public function __construct(
 
 		/** @since 1.0 */
-		public FieldPath $field,
+		public ValuePath $valueAt,
 
 		/**
 		 * @since 1.0

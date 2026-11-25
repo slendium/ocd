@@ -4,8 +4,8 @@ namespace Slendium\OcdTests\Unit\Update\Stmt;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Update;
+use Slendium\Ocd\Query\ValuePath;
 
 use Slendium\OcdTests\Unit\Query\MockUpdateVisitor;
 
@@ -19,17 +19,17 @@ use Slendium\OcdTests\Unit\Query\MockUpdateVisitor;
 final class AppendTest extends TestCase {
 
 	public function test___construct_shouldNotThrow(): void {
-		$field = new FieldPath([ 'test', 'inner' ]);
+		$path = new ValuePath([ 'test', 'inner' ]);
 		$value = 10;
 
-		$result = new Update\Append(field: $field, value: $value);
+		$result = new Update\Append(path: $path, value: $value);
 
-		$this->assertSame($field, $result->field);
+		$this->assertSame($path, $result->path);
 		$this->assertSame($value, $result->value);
 	}
 
 	public function test_accept_shouldCallAppropriateMethod(): void {
-		$sut = new Update\Append(new FieldPath([ 'foo' ]), 2);
+		$sut = new Update\Append(new ValuePath([ 'foo' ]), 2);
 		$called = false;
 		$mock = new MockUpdateVisitor([ 'visitAppend' => function() use (&$called) { $called = true; } ]);
 

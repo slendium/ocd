@@ -4,8 +4,8 @@ namespace Slendium\OcdTests\Unit\Update\Stmt;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Update;
+use Slendium\Ocd\Query\ValuePath;
 
 use Slendium\OcdTests\Unit\Query\MockUpdateVisitor;
 
@@ -19,17 +19,17 @@ use Slendium\OcdTests\Unit\Query\MockUpdateVisitor;
 final class SetTest extends TestCase {
 
 	public function test___construct_shouldNotThrow(): void {
-		$field = new FieldPath([ 'test' ]);
+		$path = new ValuePath([ 'test' ]);
 		$value = \M_PI;
 
-		$result = new Update\Set(field: $field, value: $value);
+		$result = new Update\Set(path: $path, value: $value);
 
-		$this->assertSame($field, $result->field);
+		$this->assertSame($path, $result->path);
 		$this->assertSame($value, $result->value);
 	}
 
 	public function test_accept_shouldCallAppropriateMethod(): void {
-		$sut = new Update\Set(new FieldPath([ 'foo' ]), 2);
+		$sut = new Update\Set(new ValuePath([ 'foo' ]), 2);
 		$called = false;
 		$mock = new MockUpdateVisitor([ 'visitSet' => function() use (&$called) { $called = true; } ]);
 

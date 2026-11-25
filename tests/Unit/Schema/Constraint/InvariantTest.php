@@ -4,9 +4,9 @@ namespace Slendium\OcdTests\Unit\Schema\Constraint;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Schema\Constraint\Invariant;
 use Slendium\Ocd\Query\Predicate;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * @internal
@@ -16,7 +16,7 @@ use Slendium\Ocd\Query\Predicate;
 final class InvariantTest extends TestCase {
 
 	public function test___construct_shouldNotThrow_whenPassingPredicate(): void {
-		$predicate = new Predicate\GreaterThan(new FieldPath([ 'foo' ]), 0);
+		$predicate = new Predicate\GreaterThan(new ValuePath([ 'foo' ]), 0);
 
 		$sut = new Invariant(condition: $predicate);
 
@@ -24,7 +24,7 @@ final class InvariantTest extends TestCase {
 	}
 
 	public function test___construct_shouldCallGivenClosureToProduceCondition(): void {
-		$predicate = new Predicate\LessThan(new FieldPath([ 'foo' ]), 0);
+		$predicate = new Predicate\LessThan(new ValuePath([ 'foo' ]), 0);
 
 		$sut = new Invariant(condition: fn() => $predicate);
 

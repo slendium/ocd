@@ -4,8 +4,8 @@ namespace Slendium\OcdTests\Unit\Query\Predicate;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Predicate;
+use Slendium\Ocd\Query\ValuePath;
 
 use Slendium\OcdTests\Unit\Query\MockPredicateVisitor;
 
@@ -19,7 +19,7 @@ use Slendium\OcdTests\Unit\Query\MockPredicateVisitor;
 final class LessThanOrEqualTest extends TestCase {
 
 	public function test___construct_shouldNotThrow(): void {
-		$lhs = new FieldPath([ 'test' ]);
+		$lhs = new ValuePath([ 'test' ]);
 		$rhs = 2.71828;
 
 		$result = new Predicate\LessThanOrEqual(lhs: $lhs, rhs: $rhs);
@@ -29,7 +29,7 @@ final class LessThanOrEqualTest extends TestCase {
 	}
 
 	public function test_accept_shouldCallAppropriateMethod(): void {
-		$sut = new Predicate\LessThanOrEqual(new FieldPath([ 'foo' ]), 0);
+		$sut = new Predicate\LessThanOrEqual(new ValuePath([ 'foo' ]), 0);
 		$called = false;
 		$mock = new MockPredicateVisitor([ 'visitLessThanOrEqual' => function() use (&$called) { $called = true; } ]);
 

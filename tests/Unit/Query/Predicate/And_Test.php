@@ -4,8 +4,8 @@ namespace Slendium\OcdTests\Unit\Query\Predicate;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Predicate;
+use Slendium\Ocd\Query\ValuePath;
 
 use Slendium\OcdTests\Unit\Query\MockPredicateVisitor;
 
@@ -19,7 +19,7 @@ use Slendium\OcdTests\Unit\Query\MockPredicateVisitor;
 final class And_Test extends TestCase {
 
 	public function test___construct_shouldNotThrow(): void {
-		$expr = new Predicate\Exists(new FieldPath([ 'test' ]));
+		$expr = new Predicate\Exists(new ValuePath([ 'test' ]));
 
 		$result = new Predicate\And_(inputs: [ $expr ]);
 
@@ -28,7 +28,7 @@ final class And_Test extends TestCase {
 	}
 
 	public function test_accept_shouldCallAppropriateMethod(): void {
-		$sut = new Predicate\And_([ new Predicate\Exists(new FieldPath([ 'test' ])) ]);
+		$sut = new Predicate\And_([ new Predicate\Exists(new ValuePath([ 'test' ])) ]);
 		$called = false;
 		$mock = new MockPredicateVisitor([ 'visitAnd' => function() use (&$called) { $called = true; } ]);
 

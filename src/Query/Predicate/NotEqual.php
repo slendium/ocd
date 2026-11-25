@@ -6,9 +6,9 @@ use BackedEnum;
 use DateTimeInterface;
 use Override;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Predicate;
 use Slendium\Ocd\Query\PredicateVisitor;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * Evaluates to `true` if both sides are not equal to each other, both in type and value.
@@ -23,10 +23,10 @@ final readonly class NotEqual implements Predicate {
 	public function __construct(
 
 		/** @since 1.0 */
-		public FieldPath|DateTimeInterface|BackedEnum|string|float|int|bool|null $lhs,
+		public ValuePath|DateTimeInterface|BackedEnum|string|float|int|bool|null $lhs,
 
 		/** @since 1.0 */
-		public FieldPath|DateTimeInterface|BackedEnum|string|float|int|bool|null $rhs,
+		public ValuePath|DateTimeInterface|BackedEnum|string|float|int|bool|null $rhs,
 
 	) { }
 

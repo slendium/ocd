@@ -5,6 +5,7 @@ Database- and framework agnostic database abstraction layer / ORM for PHP.
 * Supports MongoDB and SQL-based databases, can be extended further
 * Entities are based on plain PHP classes, adding `#[Attribute]`'s only where more specificity is needed
 * Does not force the active record pattern, inheritance, or a rich domain model (nor exclude them)
+* Automatable schema upgrades and data conversions
 * Supports custom types
 * No LLM-generated code
 * No dependencies
@@ -22,6 +23,19 @@ To use the ORM you also need to add one of the database-specific implementations
 
 For implementors there is also the [OCD conformance](https://git.frisiapp.com/slendium/ocd-conformance-tests) package,
 which contains implementation guides and PHPUnit tests.
+
+## Terminology
+
+Different databases use different terms to describe the same concepts.
+For this library they have been normalized as follows:
+
+* **Document**: the main data holder, also commonly called a *record* or *row* in SQL databases.
+* **Collection**: contains *documents* that can be queried, manipulated and deleted.
+  Optionally enforces a *schema* or *constraints* and supports indexing.
+* **Field**: a named key associated with a value in a *document*, usually called a *column* in SQL databases.
+* **Structured field**: a field containing structured data such as objects or arrays, commonly implemented
+  as a JSON column in SQL databases.
+* **Constraint**: a restriction applied to each *document* in a *collection*, such as the uniqueness of a field.
 
 ## Examples
 

@@ -5,9 +5,9 @@ namespace Slendium\Ocd\Query\Update;
 use Override;
 
 use Slendium\Ocd\Common\Blob;
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Update;
 use Slendium\Ocd\Query\UpdateVisitor;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * Sets a new value for the given field.
@@ -22,7 +22,7 @@ final readonly class Set implements Update {
 	public function __construct(
 
 		/** @since 1.0 */
-		public FieldPath $field,
+		public ValuePath $path,
 
 		/** @since 1.0 */
 		public mixed $value,

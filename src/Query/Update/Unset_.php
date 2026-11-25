@@ -4,9 +4,9 @@ namespace Slendium\Ocd\Query\Update;
 
 use Override;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Update;
 use Slendium\Ocd\Query\UpdateVisitor;
+use Slendium\Ocd\Query\ValuePath;
 
 /**
  * Unsets a field.
@@ -24,7 +24,7 @@ final readonly class Unset_ implements Update {
 	public function __construct(
 
 		/** @since 1.0 */
-		public FieldPath $field,
+		public ValuePath $path,
 
 	) { }
 

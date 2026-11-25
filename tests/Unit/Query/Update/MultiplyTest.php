@@ -4,8 +4,8 @@ namespace Slendium\OcdTests\Unit\Update\Stmt;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Update;
+use Slendium\Ocd\Query\ValuePath;
 
 use Slendium\OcdTests\Unit\Query\MockUpdateVisitor;
 
@@ -19,17 +19,17 @@ use Slendium\OcdTests\Unit\Query\MockUpdateVisitor;
 final class MultiplyTest extends TestCase {
 
 	public function test___construct_shouldNotThrow(): void {
-		$field = new FieldPath([ 'test' ]);
+		$path = new ValuePath([ 'test' ]);
 		$amount = 2.5;
 
-		$result = new Update\Multiply(field: $field, amount: $amount);
+		$result = new Update\Multiply(path: $path, amount: $amount);
 
-		$this->assertSame($field, $result->field);
+		$this->assertSame($path, $result->path);
 		$this->assertSame($amount, $result->amount);
 	}
 
 	public function test_accept_shouldCallAppropriateMethod(): void {
-		$sut = new Update\Multiply(new FieldPath([ 'foo' ]), 2);
+		$sut = new Update\Multiply(new ValuePath([ 'foo' ]), 2);
 		$called = false;
 		$mock = new MockUpdateVisitor([ 'visitMultiply' => function() use (&$called) { $called = true; } ]);
 

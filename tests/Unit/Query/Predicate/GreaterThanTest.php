@@ -4,8 +4,8 @@ namespace Slendium\OcdTests\Unit\Query\Predicate;
 
 use PHPUnit\Framework\TestCase;
 
-use Slendium\Ocd\Common\FieldPath;
 use Slendium\Ocd\Query\Predicate;
+use Slendium\Ocd\Query\ValuePath;
 
 use Slendium\OcdTests\Unit\Query\MockPredicateVisitor;
 
@@ -19,7 +19,7 @@ use Slendium\OcdTests\Unit\Query\MockPredicateVisitor;
 final class GreaterThanTest extends TestCase {
 
 	public function test___construct_shouldNotThrow(): void {
-		$lhs = new FieldPath([ 'test' ]);
+		$lhs = new ValuePath([ 'test' ]);
 		$rhs = 5;
 
 		$result = new Predicate\GreaterThan(lhs: $lhs, rhs: $rhs);
@@ -29,7 +29,7 @@ final class GreaterThanTest extends TestCase {
 	}
 
 	public function test_accept_shouldCallAppropriateMethod(): void {
-		$sut = new Predicate\GreaterThan(new FieldPath([ 'foo' ]), 0);
+		$sut = new Predicate\GreaterThan(new ValuePath([ 'foo' ]), 0);
 		$called = false;
 		$mock = new MockPredicateVisitor([ 'visitGreaterThan' => function() use (&$called) { $called = true; } ]);
 

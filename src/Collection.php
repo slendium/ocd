@@ -7,6 +7,7 @@ use Countable;
 use Traversable;
 
 use Slendium\Ocd\Collection\WriteCommand;
+use Slendium\Ocd\Cursor\Countable as CursorCountable;
 use Slendium\Ocd\Cursor\Filterable;
 use Slendium\Ocd\Cursor\Scrollable;
 use Slendium\Ocd\Query\Predicate;
@@ -29,9 +30,9 @@ interface Collection {
 	 * Opens a new cursor backed by this collection.
 	 * @since 1.0
 	 * @see Cursor
-	 * @return Filterable&Scrollable&Traversable<ArrayAccess<non-empty-string,mixed>&Countable&Traversable<non-empty-string,mixed>>
+	 * @return Filterable&Scrollable&CursorCountable&Traversable<ArrayAccess<non-empty-string,mixed>&Countable&Traversable<non-empty-string,mixed>>
 	 */
-	public function openCursor(): Filterable&Scrollable&Traversable;
+	public function openCursor(): Filterable&Scrollable&CursorCountable&Traversable;
 
 	/**
 	 * Creates a new command that allows inserting one or more documents into the collection.

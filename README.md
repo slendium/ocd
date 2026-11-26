@@ -12,7 +12,7 @@ Database- and framework agnostic database abstraction layer / ORM for PHP.
 
 ## Installation
 
-Requires **PHP >= 8.5**.
+Requires **PHP >= 8.6**.
 Run `composer require slendium/ocd` to add it to your project.
 To use the ORM you also need to add one of the database-specific implementations:
 

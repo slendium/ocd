@@ -28,7 +28,7 @@ final class UniqueIdentifier implements Type {
 	}
 
 	#[Override]
-	public function deserialize(object|iterable|string|float|int|bool|null $stored): string {
+	public function deserialize(mixed $stored): UniqueIdentifierValue {
 		throw new \Exception('Not implemented');
 	}
 

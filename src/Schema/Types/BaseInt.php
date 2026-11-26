@@ -11,19 +11,22 @@ use Slendium\Ocd\Schema\Type;
  * @author C. Fahner
  * @copyright Slendium 2026
  */
-abstract class BaseInt implements Type, Type\Sized {
+abstract class BaseInt implements Type, Type\Sized, Type\DefaultSerializable {
 
 	/** @since 1.0 */
-	const SIZE_INT8 = 1;
+	const int SIZE_INT8 = 1;
 
 	/** @since 1.0 */
-	const SIZE_INT16 = 2;
+	const int SIZE_INT16 = 2;
 
 	/** @since 1.0 */
-	const SIZE_INT32 = 4;
+	const int SIZE_INT32 = 4;
 
 	/** @since 1.0 */
-	const SIZE_INT64 = 8;
+	const int SIZE_INT64 = 8;
+
+	/** @since 1.0 */
+	const int SERIALIZE_DEFAULT = 0;
 
 	/** @since 1.0 */
 	public function __construct(
@@ -35,13 +38,23 @@ abstract class BaseInt implements Type, Type\Sized {
 	) { }
 
 	#[Override]
-	public function serialize(mixed $value): ?int {
+	public function serialize(mixed $value): int {
 		throw new \Exception('Not implemented');
 	}
 
 	#[Override]
-	public function deserialize(object|iterable|string|float|int|bool|null $stored): int {
+	public function deserialize(mixed $stored): int {
 		throw new \Exception('Not implemented');
+	}
+
+	#[Override]
+	public function isDefaultSerializeValue(mixed $value): bool {
+		return $value === self::SERIALIZE_DEFAULT;
+	}
+
+	#[Override]
+	public function getDefaultSerializeValue(): float {
+		return self::SERIALIZE_DEFAULT;
 	}
 
 }

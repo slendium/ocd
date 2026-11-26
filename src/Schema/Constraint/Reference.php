@@ -75,7 +75,7 @@ final readonly class Reference implements Schema\Constraint {
 	private static function resolveFieldMapping(string $targetClass, array $mapping): array {
 		$targetFields = \array_flip(\array_values($mapping));
 
-		foreach (Schema\Fields::getFieldParameters(new ReflectionClass($targetClass)) as $parameter) {
+		foreach (Schema\Fields::getFieldParametersFromClass(new ReflectionClass($targetClass)) as $parameter) {
 			if (isset($targetFields[$parameter->name])) {
 				$targetFields[$parameter->name] = self::createExplicitlyTypedField($parameter, $targetClass);
 			}

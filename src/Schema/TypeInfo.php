@@ -36,7 +36,7 @@ final readonly class TypeInfo {
 	/** @return class-string|'array'|'string'|'float'|'int'|'bool' */
 	private static function getSerializedTypeFromUnionType(ReflectionUnionType $union, string $typeClass): string {
 		$types = $union->getTypes();
-		if (\count($types) > 3) {
+		if (\count($types) > 2) {
 			throw TypeException::forAmbiguousSerialization($typeClass, $union);
 		}
 
@@ -47,7 +47,7 @@ final readonly class TypeInfo {
 			}
 
 			$name = $type->getName();
-			if ($name !== 'null' && $name !== Type\SerializeException::class) {
+			if ($name !== Type\SerializeException::class) {
 				$serializedTypes[] = self::getSerializedTypeFromNamedType($type, $typeClass);
 			}
 		}
@@ -59,6 +59,10 @@ final readonly class TypeInfo {
 
 	/** @return class-string|'array'|'string'|'float'|'int'|'bool' */
 	private static function getSerializedTypeFromNamedType(ReflectionNamedType $type, string $typeClass): string {
+		if ($type->allowsNull()) {
+			throw TypeException::forNullableSerialization($typeClass);
+		}
+
 		return !$type->isBuiltin() || self::isSerializableBuiltin($type->getName()) // @phpstan-ignore return.type
 			? $type->getName()
 			: throw TypeException::forUnsupportedSerialization($typeClass, $type->getName());

@@ -29,7 +29,7 @@ final class DateTime implements Type {
 	}
 
 	#[Override]
-	public function deserialize(object|iterable|string|float|int|bool|null $stored): string {
+	public function deserialize(mixed $stored): string {
 		throw new \Exception('Not implemented.');
 	}
 

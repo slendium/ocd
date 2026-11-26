@@ -42,12 +42,12 @@ final class Blob implements Type, Type\ByteLimited {
 	) { }
 
 	#[Override]
-	public function serialize(mixed $value): ?BlobValue {
+	public function serialize(mixed $value): BlobValue {
 		throw new \Exception('Not implemented');
 	}
 
 	#[Override]
-	public function deserialize(object|iterable|string|float|int|bool|null $stored): bool {
+	public function deserialize(mixed $stored): bool {
 		throw new \Exception('Not implemented');
 	}
 

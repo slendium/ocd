@@ -21,7 +21,7 @@ class IterableType implements Type {
 	}
 
 	#[Override]
-	public function deserialize(object|iterable|string|float|int|bool|null $stored): mixed {
+	public function deserialize(mixed $stored): mixed {
 		throw new Exception('Not implemented');
 	}
 

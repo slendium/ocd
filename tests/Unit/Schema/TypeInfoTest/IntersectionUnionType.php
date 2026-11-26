@@ -16,12 +16,12 @@ use Slendium\Ocd\Schema\Type;
 class IntersectionUnionType implements Type {
 
 	#[Override]
-	public function serialize(mixed $value): (Type\SerializeException&DateTimeInterface)|null {
+	public function serialize(mixed $value): (Type\SerializeException&DateTimeInterface)|float {
 		throw new Exception('Not implemented');
 	}
 
 	#[Override]
-	public function deserialize(object|iterable|string|float|int|bool|null $stored): mixed {
+	public function deserialize(mixed $stored): mixed {
 		throw new Exception('Not implemented');
 	}
 

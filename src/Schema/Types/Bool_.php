@@ -13,26 +13,36 @@ use Slendium\Ocd\Schema\Type;
  * @copyright Slendium 2026
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class Bool_ implements Type {
+final class Bool_ implements Type, Type\DefaultSerializable {
+
+	/** @since 1.0 */
+	const false SERIALIZE_DEFAULT = false;
 
 	private static self $instance;
 
-	/** @internal */
+	/** @since 1.0 */
 	public static function instance(): self {
 		return self::$instance ??= new self;
 	}
 
-	/** @since 1.0 */
-	public function __construct() { }
-
 	#[Override]
-	public function serialize(mixed $value): ?bool {
+	public function serialize(mixed $value): bool {
 		throw new \Exception('Not implemented');
 	}
 
 	#[Override]
-	public function deserialize(object|iterable|string|float|int|bool|null $stored): bool {
+	public function deserialize(mixed $stored): bool {
 		throw new \Exception('Not implemented');
+	}
+
+	#[Override]
+	public function isDefaultSerializeValue(mixed $value): bool {
+		return $value === self::SERIALIZE_DEFAULT;
+	}
+
+	#[Override]
+	public function getDefaultSerializeValue(): bool {
+		return self::SERIALIZE_DEFAULT;
 	}
 
 }

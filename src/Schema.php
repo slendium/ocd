@@ -68,7 +68,7 @@ final readonly class Schema {
 			$reflector = new ReflectionClass($class);
 			$builder = Schema\Builder::forClass($reflector);
 
-			foreach (Schema\Fields::getFieldParameters($reflector) as $parameter) {
+			foreach (Schema\Fields::getFieldParametersFromClass($reflector) as $parameter) {
 				$builder->addFieldParameter($parameter);
 			}
 

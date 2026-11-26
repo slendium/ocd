@@ -11,6 +11,11 @@ namespace Slendium\Ocd\Entity;
  * This interface can be used to return different subclasses of the entity based on a database field
  * or to free up the regular constructor (eg. for a variadic parameter).
  *
+ * Note that a static constructor method prevents the {@see SchemaAssembler} to create entities from
+ * partial documents.
+ * This means you should probably also implement {@see FromDocument} to allow your object to work with
+ * partial documents.
+ *
  * @since 1.0
  * @author C. Fahner
  * @copyright Slendium 2026
